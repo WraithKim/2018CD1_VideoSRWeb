@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
-import os
+import os, env
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -76,9 +76,9 @@ WSGI_APPLICATION = 'website.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'videosr_database',
-        'USER': 'videosr',
-        'PASSWORD': 'capstonedesign',
+        'NAME': env.DATABASE_NAME,
+        'USER': env.DATABASE_USER,
+        'PASSWORD': env.DATABASE_PASSWORD,
         'HOST': 'localhost',
         'PORT': '',
     }

@@ -15,3 +15,6 @@ media
 
 
 # End of https://www.gitignore.io/api/django
+
+### Custom ignore ###
+env.py
