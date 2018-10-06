@@ -16,14 +16,16 @@ class UploadedFile(models.Model):
     uploaded_date = models.DateTimeField(auto_now_add=True)
     uploaded_file_size = models.BigIntegerField()
     uploaded_file_version = models.CharField(max_length=255)
+    # This field is real file name. Be aware of that 'uploaded_file.name' is '/path/to/file/uploaded_file_version'
+    uploaded_filename = models.CharField(max_length=255)
     progress_status = models.CharField(
         max_length=2,
         choices=STATUS_CODES,
         default=IN_PROGRESS,
     )
-    
+
     def __str__(self):
-        return os.path.basename(self.uploaded_file.name)
+        return self.uploaded_filename
 
     # delete the file and make sure to also delete from storage
     def delete(self, delete_file=True, *args, **kwargs):

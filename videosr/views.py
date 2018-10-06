@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.conf import settings
+from django.http import HttpResponse
 from .models import UploadedFile
 from .forms import UploadedFileForm
 from .utils import upload_file
-from django.http import HttpResponse
 import urllib.parse
-from django.conf import settings
 
 # Create your views here.
 def index(request):
@@ -33,8 +33,8 @@ def download_test(request):
 def download_file(request, pk):
     file_to_download = get_object_or_404(UploadedFile, pk=pk)
     response = HttpResponse()
-    response['Content-Disposition'] = 'attachment; filename={0}'.format(urllib.parse.quote_plus(file_to_download.uploaded_file_nickname))
-    response['X-Accel-Redirect'] = '/media/{0}'.format(urllib.parse.quote_plus(file_to_download.uploaded_file.name))
+    response['Content-Disposition'] = 'attachment; filename={0}'.format(urllib.parse.quote(file_to_download.uploaded_filename))
+    response['X-Accel-Redirect'] = '/media/{0}'.format(file_to_download.uploaded_file.name)
     return response
 
 def delete_file(request, pk):

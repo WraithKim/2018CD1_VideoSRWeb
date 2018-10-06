@@ -173,7 +173,7 @@ LOGGING = {
             'level':'INFO', 
         }, 
         
-        'myAppName': { 
+        'videosr': { 
             'handlers': ['file'], 
             'level': 'DEBUG', 
         }, 

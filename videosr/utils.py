@@ -22,10 +22,11 @@ def move_upload_to_storage(source, dst):
 def upload_file(name, version, path, size):
     if os.path.exists(path):
         
-        new_name = os.path.join('uploads', name)
+        new_name = os.path.join('uploads', version)
         move_upload_to_storage(path, new_name)
         new_file = UploadedFile.objects.create(uploaded_file=new_name,
                                                uploaded_file_size=size,
-                                               uploaded_file_version=version)
+                                               uploaded_file_version=version,
+                                               uploaded_filename=name)
         new_file.save()
         return new_file
