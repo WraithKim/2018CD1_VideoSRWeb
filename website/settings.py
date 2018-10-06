@@ -10,7 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
-import os, env
+import os
+import json
+
+# open config.json
+with open('config.json', 'r') as f:
+    config = json.load(f)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'videosr',
 ]
 
 MIDDLEWARE = [
@@ -76,9 +82,9 @@ WSGI_APPLICATION = 'website.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': env.DATABASE_NAME,
-        'USER': env.DATABASE_USER,
-        'PASSWORD': env.DATABASE_PASSWORD,
+        'NAME': config['DATABASE']['NAME'],
+        'USER': config['DATABASE']['USER'],
+        'PASSWORD': config['DATABASE']['PASSWORD'],
         'HOST': 'localhost',
         'PORT': '',
     }
@@ -122,4 +128,55 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static', '')
+# URL prefix for each media file
+MEDIA_URL = '/media/'
+# Directory path to save uploaded file
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media', '')
+
+# Logging
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'formatters': { 
+        'verbose': { 
+            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s", 
+            'datefmt' : "%d/%b/%Y %H:%M:%S" 
+        }, 
+        'simple': { 
+            'format': '%(levelname)s %(message)s' 
+        }, 
+    },
+
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/home/wraithkim/testserver/debug.log',     
+            'formatter': 'verbose',
+            'maxBytes':1024*1024*10, 
+            'backupCount':5,
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+
+        'django.request': { 
+            'handlers':['file'], 
+            'propagate': False, 
+            'level':'INFO', 
+        }, 
+        
+        'myAppName': { 
+            'handlers': ['file'], 
+            'level': 'DEBUG', 
+        }, 
+    }
+}
+
