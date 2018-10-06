@@ -153,8 +153,8 @@ LOGGING = {
     'handlers': {
         'file': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': '/home/wraithkim/testserver/debug.log',     
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/home/wraithkim/videoSRWeb/log/debug.log',     
             'formatter': 'verbose',
             'maxBytes':1024*1024*10, 
             'backupCount':5,
