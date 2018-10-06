@@ -1,0 +1,12 @@
+{% extends "videosrtest/base.html" %}
+
+{% block content %}
+    <h1>Upload Test</h1>
+    <form method="POST" enctype="multipart/form-data" action="/upload/progress/">
+        {% csrf_token %}
+		<input type="file" name="uploaded_file">
+		<input type="submit" value="Upload">
+    </form>
+    <hr>
+    <a href="{% url 'index' %}">Back to the index</a>
+{% endblock %}
