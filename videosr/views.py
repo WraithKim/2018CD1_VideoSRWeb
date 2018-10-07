@@ -1,17 +1,23 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
 from django.http import HttpResponse
+from django.views.decorators.http import require_POST
+
 from .models import UploadedFile
 from .forms import UploadedFileForm
-from .utils import upload_file
-import urllib.parse
+from .utils import upload_file, is_valid_file_request
+import urllib.parse, logging, os
+
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 def index(request):
     return render(request, 'videosr/index.html', {})
 
+@require_POST
 def upload_complete(request):
-    if request.method == 'POST':
+    logger.debug("post attributes: {}".format(request.POST))
+    if is_valid_file_request(request.POST):
         path = request.POST.get('uploaded_file.path')
         size = request.POST.get('uploaded_file.size')
         filename = request.POST.get('uploaded_file.name')
@@ -21,14 +27,19 @@ def upload_complete(request):
 
         upload_file(name=filename, version=version, path=path, size=size)
         return redirect('download_test')
-    return redirect('index')
+    # if validation failed, remove uploaded file
+    path = request.POST.get('uploaded_file.path')
+    if path and os.path.exists(path):
+        os.remove(path)
+    return redirect('upload_test')
 
 def upload_test(request):
-    return render(request, 'videosr/upload_test.html', {})
+    form = UploadedFileForm()
+    return render(request, 'videosr/upload_test.html', { 'form': form })
 
 def download_test(request):
     uploaded_files = UploadedFile.objects.all()
-    return render(request, 'videosr/download_test.html', {'files' : uploaded_files})
+    return render(request, 'videosr/download_test.html', { 'files' : uploaded_files })
 
 def download_file(request, pk):
     file_to_download = get_object_or_404(UploadedFile, pk=pk)

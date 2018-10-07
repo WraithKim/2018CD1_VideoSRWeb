@@ -4,7 +4,7 @@
     <h1>Upload Test</h1>
     <form method="POST" enctype="multipart/form-data" action="/upload/progress/">
         {% csrf_token %}
-		<input type="file" name="uploaded_file">
+		{{ form }}
 		<input type="submit" value="Upload">
     </form>
     <hr>
