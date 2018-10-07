@@ -16,7 +16,6 @@ def index(request):
 
 @require_POST
 def upload_complete(request):
-    logger.debug("post attributes: {}".format(request.POST))
     if is_valid_file_request(request.POST):
         path = request.POST.get('uploaded_file.path')
         size = request.POST.get('uploaded_file.size')
@@ -29,7 +28,7 @@ def upload_complete(request):
         return redirect('download_test')
     # if validation failed, remove uploaded file
     path = request.POST.get('uploaded_file.path')
-    if path and os.path.exists(path):
+    if path and os.path.isfile(path):
         os.remove(path)
     return redirect('upload_test')
 

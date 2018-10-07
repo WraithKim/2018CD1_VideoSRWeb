@@ -1,6 +1,8 @@
 from .models import UploadedFile
 from django.conf import settings
-import os, shutil
+import os, shutil, logging
+
+logger = logging.getLogger(__name__)
 
 def move_upload_to_storage(source, dst):
     """move uploaded file from nginx module to the storage
@@ -55,7 +57,7 @@ def is_valid_file_request(request_post):
 
         if not path or not size or not filename or not version:
             return False
-        if not os.path.exists(path):
+        if not os.path.isfile(path):
             return False
         if len(filename) > 255:
             return False

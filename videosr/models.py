@@ -1,8 +1,5 @@
 from django.db import models
 from django.utils import timezone
-import os
-
-# Create your models here.
 
 class UploadedFile(models.Model):
     IN_PROGRESS = 'IP'
@@ -26,11 +23,3 @@ class UploadedFile(models.Model):
 
     def __str__(self):
         return self.uploaded_filename
-
-    # delete the file and make sure to also delete from storage
-    def delete(self, delete_file=True, *args, **kwargs):
-        if self.uploaded_file:
-            storage, path = self.uploaded_file.storage, self.uploaded_file.path
-        super(UploadedFile, self).delete(*args, **kwargs)
-        if self.uploaded_file and delete_file:
-            storage.delete(path)
