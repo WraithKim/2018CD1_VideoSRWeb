@@ -1,6 +1,6 @@
 from .models import UploadedFile
 from django.conf import settings
-import os, shutil, logging
+import os, shutil, logging, uuid
 
 logger = logging.getLogger(__name__)
 
@@ -19,12 +19,11 @@ def move_upload_to_storage(source, dst):
     shutil.move(source, new_path)
     return new_path
 
-def upload_file(name, version, path, size):
+def upload_file(name, path, size):
     """save uploaded file as UploadedFile Model and move to storage.
 
     Arguments:
         name {str} -- the path to the file uploaded (in nginx module)
-        version {str} -- the name of file from request object
         path {str} -- the md5 sum of the file
         size {str} -- the file size.
     
@@ -34,11 +33,10 @@ def upload_file(name, version, path, size):
 
     if os.path.exists(path):
         
-        new_name = os.path.join('uploads', version)
+        new_name = os.path.join('uploads', str(uuid.uuid4()))
         move_upload_to_storage(path, new_name)
         new_file = UploadedFile.objects.create(uploaded_file=new_name,
                                                uploaded_file_size=size,
-                                               uploaded_file_version=version,
                                                uploaded_filename=name)
         new_file.save()
         return new_file
@@ -53,9 +51,8 @@ def is_valid_file_request(request_post):
         path = request_post.get('uploaded_file.path')
         size = request_post.get('uploaded_file.size')
         filename = request_post.get('uploaded_file.name')
-        version = request_post.get('uploaded_file.md5')
 
-        if not path or not size or not filename or not version:
+        if not path or not size or not filename:
             return False
         if not os.path.isfile(path):
             return False

@@ -1,5 +1,8 @@
 {% extends 'videosr/base.html' %}
 
+{% block style %}
+{% endblock %}
+
 {% block content %}
     <h1>Download files</h1>
     {% for file in files %}
@@ -7,4 +10,7 @@
     {% endfor %}
     <hr>
     <a href="{% url 'index' %}">Back to the index</a>
+{% endblock %}
+
+{% block script %}
 {% endblock %}

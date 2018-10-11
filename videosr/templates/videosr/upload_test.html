@@ -1,12 +1,30 @@
 {% extends "videosr/base.html" %}
-
+{% load static %}
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{% static "videosr/css/upload-test.css" %}">
+{% endblock %}
 {% block content %}
     <h1>Upload Test</h1>
-    <form method="POST" enctype="multipart/form-data" action="/upload/progress/">
+    <div>
         {% csrf_token %}
-		{{ form }}
-		<input type="submit" value="Upload">
-    </form>
+        <span>File name: </span><label id="filename"></label><br>
+        <span class="btn btn-success fileinput-button">
+            <i class="glyphicon glyphicon-plus"></i>
+            <span>Add files...</span>
+            <input id="resumable-upload" type="file" name="uploaded_file" data-url="/upload/progress/">
+        </span>
+        <button id="start_upload" type="button" class="btn btn-primary">
+            <span>Start upload</span>
+        </button>
+    </div>
+    <div id="progress" class="progress-bar progress-bar-success"></div>
     <hr>
     <a href="{% url 'index' %}">Back to the index</a>
+{% endblock %}
+{% block script %}
+    <script src="{% static "videosr/jquery-fileupload/js/vendor/jquery.ui.widget.js" %}"></script>
+    <script src="{% static "videosr/jquery-fileupload/js/jquery.iframe-transport.js" %}"></script>
+    <script src="{% static "videosr/jquery-fileupload/js/jquery.fileupload.js" %}"></script>
+    <script src="{% static "videosr/json-js/json2.js" %}"></script>
+    <script src="{% static "videosr/js/resumable-upload.js" %}"></script>
 {% endblock %}
