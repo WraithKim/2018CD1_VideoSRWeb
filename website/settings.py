@@ -129,6 +129,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static', '')
+
+# this directory for staticfiles which is independent from all apps.
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'staticfiles', '')
+]
+
 # URL prefix for each media file
 MEDIA_URL = '/media/'
 # Directory path to save uploaded file

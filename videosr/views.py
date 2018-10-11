@@ -20,11 +20,11 @@ def upload_complete(request):
         path = request.POST.get('uploaded_file.path')
         size = request.POST.get('uploaded_file.size')
         filename = request.POST.get('uploaded_file.name')
-        version = request.POST.get('uploaded_file.md5')
 
         # maybe authentication here
 
-        upload_file(name=filename, version=version, path=path, size=size)
+        upload_file(name=filename, path=path, size=size)
+        # TODO: research for redirect that out of order.
         return redirect('download_test')
     # if validation failed, remove uploaded file
     path = request.POST.get('uploaded_file.path')
@@ -33,8 +33,7 @@ def upload_complete(request):
     return redirect('upload_test')
 
 def upload_test(request):
-    form = UploadedFileForm()
-    return render(request, 'videosr/upload_test.html', { 'form': form })
+    return render(request, 'videosr/upload_test.html', {})
 
 def download_test(request):
     uploaded_files = UploadedFile.objects.all()
