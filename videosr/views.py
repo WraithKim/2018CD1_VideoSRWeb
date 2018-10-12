@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
+from django.contrib.auth.models import User
 
+from social_django.models import UserSocialAuth
 from .models import UploadedFile
 from .forms import UploadedFileForm
 from .utils import upload_file, is_valid_file_request
@@ -25,15 +27,15 @@ def upload_complete(request):
 
         upload_file(name=filename, path=path, size=size)
         # TODO: research for redirect that out of order.
-        return redirect('download_test')
+        return HttpResponse(status=200)
     # if validation failed, remove uploaded file
     path = request.POST.get('uploaded_file.path')
     if path and os.path.isfile(path):
         os.remove(path)
-    return redirect('upload_test')
+    return HttpResponse(status=400)
 
 def upload_test(request):
-    return render(request, 'videosr/upload_test.html', {})
+    return render(request, 'videosr/upload_test.html')
 
 def download_test(request):
     uploaded_files = UploadedFile.objects.all()
@@ -51,3 +53,10 @@ def delete_file(request, pk):
     file_to_delete.delete()
     return redirect('download_test')
 
+def login_test(request):
+    return render(request, 'videosr/login_test.html')
+
+def delete_account(request):
+    UserSocialAuth.objects.filter(user=request.user).delete()
+    User.objects.filter(pk=request.user.pk).delete()
+    return redirect('login_test')

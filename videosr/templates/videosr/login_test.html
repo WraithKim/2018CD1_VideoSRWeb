@@ -1,0 +1,17 @@
+{% extends 'videosr/base.html' %}
+{% block style %}
+{% endblock %}
+{% block content %}
+    <h1>Login test</h1>
+    {% if user.is_authenticated %}
+        <p>Hello, {{ user.username }}</p>
+	<a href="{% url 'logout' %}"><button class="btn btn-warning" style="width: 40%">Log Out</button></a>
+	<a href="{% url 'delete_account' %}"><button class="btn btn-danger" style="width: 40%">Delete Account</button></a>
+    {% else %}
+        <p>You are not logged in</p>
+        <a href="{% url "social:begin" "google-oauth2" %}"><button class="btn btn-danger" style="width: 40%">G+ Login</button></a>
+    {% endif %}
+{% endblock %}
+
+{% block script %}
+{% endblock %}

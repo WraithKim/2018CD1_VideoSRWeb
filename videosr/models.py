@@ -12,6 +12,7 @@ class UploadedFile(models.Model):
     uploaded_file = models.FileField()
     uploaded_date = models.DateTimeField(auto_now_add=True)
     uploaded_file_size = models.BigIntegerField()
+    # Currently, This file version field is not using since resumable upload didn't calculate md5 hash.
     uploaded_file_version = models.CharField(max_length=255, null=True)
     # This field is real file name. Be aware of that 'uploaded_file.name' is '/path/to/file/uploaded_file_version'
     uploaded_filename = models.CharField(max_length=255)
