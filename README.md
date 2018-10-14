@@ -7,6 +7,9 @@
 * Django
 * Pytorch
 * PostgreSQL
+* opencv
+* opencv-python
+* numpy
 
 # 팀 화질구지
 역할 | 팀원명
@@ -20,6 +23,6 @@
 - [ ] 회원 관리
 - [ ] UI
 - [ ] 결제 시스템
-- [ ] 동영상 SR
+- [x] 동영상 SR (But, Work in progress......performance is too low :-(  )
 - [ ] 웹-SR 모듈간 데이터 교환
 - [ ] 동영상 업로드/다운로드

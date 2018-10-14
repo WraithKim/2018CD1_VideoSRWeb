@@ -3,3 +3,8 @@ pkg-resources==0.0.0
 psycopg2-binary==2.7.5
 pytz==2018.5
 uWSGI==2.0.17.1
+torch
+torchvision
+opencv-python
+pillow
+numpy
