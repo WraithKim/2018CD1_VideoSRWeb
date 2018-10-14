@@ -21,7 +21,8 @@ def upload_complete(request):
     if is_valid_file_request(request.POST):
         path = request.POST.get('uploaded_file.path')
         size = request.POST.get('uploaded_file.size')
-        filename = request.POST.get('uploaded_file.name')
+        # Filename is encoded to url when jQuery-File-Upload send the file.
+        filename = urllib.parse.unquote(request.POST.get('uploaded_file.name'))
 
         # maybe authentication here
 

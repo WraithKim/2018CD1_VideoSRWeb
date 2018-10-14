@@ -30,9 +30,7 @@ def upload_file(name, path, size):
     Returns:
         UploadedFile -- UploadedFile object about uploaded file.
     """
-
-    if os.path.exists(path):
-        
+    if os.path.exists(path):     
         new_name = os.path.join('uploads', str(uuid.uuid4()))
         move_upload_to_storage(path, new_name)
         new_file = UploadedFile.objects.create(uploaded_file=new_name,
