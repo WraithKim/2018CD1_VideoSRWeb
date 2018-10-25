@@ -3,6 +3,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect
 
 from social_django.models import UserSocialAuth
 from .models import UploadedFile
