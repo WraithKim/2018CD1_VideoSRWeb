@@ -9,6 +9,7 @@ from .models import UploadedFile
 from .forms import UploadedFileForm
 from .utils import upload_file, is_valid_file_request
 import urllib.parse, logging, os
+import random, json,requests
 
 logger = logging.getLogger(__name__)
 
@@ -61,3 +62,35 @@ def delete_account(request):
     UserSocialAuth.objects.filter(user=request.user).delete()
     User.objects.filter(pk=request.user.pk).delete()
     return redirect('login_test')
+
+def payment_test(request):
+    return render(request, 'videosr/payment_test.html')
+
+def payment_request(request, amount):
+    url = "https://pay.toss.im/api/v1/payments"
+    params = {
+        "orderNo": random.random(),
+        #"orderNo": "2015072012411",
+        "amount": amount,
+        "amountTaxFree": 0,
+        "productDesc":"테스트 결제",
+        "apiKey": "sk_test_apikey1234567890",
+        "expiredTime":"2015-07-20 16:21:00",
+        "resultCallback": "https://myshop.com/toss/result.php",
+        "retUrl": "https://videosr.koreacentral.cloudapp.azure.com/payment/"+ amount + "/success/",
+        "cashRecipt": False
+    }
+
+    r = requests.post(url, data=params)
+    d = json.loads(r.text)
+
+    return HttpResponseRedirect(d['checkoutPage'])
+
+def payment_success(request, amount):
+    # DB에 amount에 해당하는 값 만큼 update
+
+    # print(amount)
+
+    # 디비 갱신
+
+    return render(request, 'videosr/payment_success.html')

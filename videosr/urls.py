@@ -10,4 +10,7 @@ urlpatterns = [
     path('download/<int:pk>/delete/', views.delete_file, name='delete_file'),
     path('login/', views.login_test, name='login_test'),
     path('login/delete/', views.delete_account, name='delete_account'),
+    path('payment/', views.payment_test, name='payment_test'),
+    path('payment/<amount>/', views.payment_request, name='payment_request'),
+    path('payment/<amount>/success/',views.payment_success, name='payment_success'),
 ]
