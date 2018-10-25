@@ -72,7 +72,11 @@
 
                          <!--BUTTON START-->
                          <div class="generic_price_btn clearfix">
-                         	<a href="{% url 'payment_request' amount='9900' %}">Pay</a>
+                          {% if user.is_authenticated %}
+                         	  <a href="{% url 'payment_request' amount='9900' %}">Pay</a>
+                          {% else %}
+                            <a href="{% url 'login_test' %}">Sign in</a>
+                          {% endif %}
                          </div>
                          <!--//BUTTON END-->
 
@@ -130,7 +134,11 @@
 
                          <!--BUTTON START-->
                          <div class="generic_price_btn clearfix">
-                         	<a href="{% url 'payment_request' amount='19900' %}">pay</a>
+                          {% if user.is_authenticated %}
+                            <a href="{% url 'payment_request' amount='19900' %}">pay</a>
+                          {% else %}
+                            <a href="{% url 'login_test' %}">Sign in</a>
+                          {% endif %}
                          </div>
                          <!--//BUTTON END-->
 
@@ -187,7 +195,11 @@
 
                          <!--BUTTON START-->
                          <div class="generic_price_btn clearfix">
-                         	<a href="{% url 'payment_request' amount='49900' %}">Pay</a>
+                           {% if user.is_authenticated %}
+                             <a href="{% url 'payment_request' amount='49900' %}">Pay</a>
+                           {% else %}
+                             <a href="{% url 'login_test' %}">Sign in</a>
+                           {% endif %}
                          </div>
                          <!--//BUTTON END-->
 

@@ -24,3 +24,11 @@ class UploadedFile(models.Model):
 
     def __str__(self):
         return self.uploaded_filename
+
+
+class Customer(models.Model):
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    credit = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return self.userId + ',' + self.credit

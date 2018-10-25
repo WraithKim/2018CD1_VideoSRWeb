@@ -4,9 +4,15 @@
 {% endblock %}
 
 {% block content %}
-    <p1> 결제가 완료되었습니다 </p1>
+    {% if user.is_authenticated %}
+        <p1> 결제가 완료되었습니다 </p1>
+        <p> 현재 크래딧은 {{ credit }} 입니다.</p>
+    {% else %}
+        <p>You are not logged in</p>
+    {% endif %}
     <hr>
     <a href="{% url 'index' %}">Back to the index</a>
+
 {% endblock %}
 
 {% block script %}

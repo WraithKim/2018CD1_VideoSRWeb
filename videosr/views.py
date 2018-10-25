@@ -88,10 +88,10 @@ def payment_request(request, amount):
     return HttpResponseRedirect(d['checkoutPage'])
 
 def payment_success(request, amount):
+
     # DB에 amount에 해당하는 값 만큼 update
+    curCustomer = Customer.objects.get(user=request.user)
+    curCustomer.credit += amount
+    curCustomer.save()
 
-    # print(amount)
-
-    # 디비 갱신
-
-    return render(request, 'videosr/payment_success.html')
+    return render(request, 'videosr/payment_success.html', {credit : curCustomer.credit})
