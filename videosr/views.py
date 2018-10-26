@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 
 from social_django.models import UserSocialAuth
-from .models import UploadedFile
+from .models import UploadedFile, Customer
 from .forms import UploadedFileForm
 from .utils import upload_file, is_valid_file_request
 import urllib.parse, logging, os
@@ -91,7 +91,7 @@ def payment_success(request, amount):
 
     # DB에 amount에 해당하는 값 만큼 update
     curCustomer = Customer.objects.get(user=request.user)
-    curCustomer.credit += amount
+    curCustomer.credit += int(amount)
     curCustomer.save()
 
-    return render(request, 'videosr/payment_success.html', {credit : curCustomer.credit})
+    return render(request, 'videosr/payment_success.html', {'credit' : curCustomer.credit})

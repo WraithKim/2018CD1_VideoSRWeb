@@ -28,7 +28,7 @@ class UploadedFile(models.Model):
 
 class Customer(models.Model):
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-    credit = models.PositiveIntegerField(default=0)
+    credit = models.PositiveIntegerField()
 
     def __str__(self):
-        return self.userId + ',' + self.credit
+        return self.user + ',' + self.credit
