@@ -6,7 +6,7 @@
 {% block content %}
     <h1>Download Test</h1>
     {% for file in files %}
-        <a href="{% url 'download_file' pk=file.pk %}" download>{{ file }}</a><a href="{% url 'delete_file' pk=file.pk %}"><i class="glyphicon glyphicon-remove" style="font-size:12px;color:red;padding:4px;"></i></a><br>
+        <a href="{% url 'download_file' pk=file.pk %}" download>{{ file }}</a><a href="{% url 'delete_file' pk=file.pk %}"><i class="fas fa-trash-alt" style="font-size:12px;color:red;padding:4px;"></i></a><br>
     {% endfor %}
     <hr>
     <a href="{% url 'index' %}">Back to the index</a>
