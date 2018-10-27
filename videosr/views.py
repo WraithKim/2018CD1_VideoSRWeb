@@ -87,6 +87,7 @@ def payment_request(request, amount):
 
     return HttpResponseRedirect(d['checkoutPage'])
 
+@login_required
 def payment_success(request, amount):
 
     # DB에 amount에 해당하는 값 만큼 update
