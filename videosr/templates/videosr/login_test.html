@@ -5,7 +5,7 @@
     <h1>Login Test</h1>
     {% if user.is_authenticated %}
         <p>Hello, {{ user.username }}.</p>
-	{% if logined_user_credit %}
+	{% if logined_user_credit is not None %}
             <p>Your credit is {{ logined_user_credit }}.</p>
 	{% else %}
 	    <p>You have no credit infomation. Ask to admin.</p>
