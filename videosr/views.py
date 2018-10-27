@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 
@@ -57,7 +58,14 @@ def delete_file(request, pk):
     return redirect('download_test')
 
 def login_test(request):
-    return render(request, 'videosr/login_test.html')
+    logined_user_credit = None
+    try:
+        logined_user_credit = Customer.objects.get(user=request.user).credit
+    except Customer.DoesNotExist:
+        # if user's credit doesn't exist, render login test page with logined_user_credit = None
+        pass
+    finally:
+        return render(request, 'videosr/login_test.html', {'logined_user_credit': logined_user_credit})
 
 def delete_account(request):
     UserSocialAuth.objects.filter(user=request.user).delete()
