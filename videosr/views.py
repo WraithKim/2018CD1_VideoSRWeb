@@ -68,8 +68,10 @@ def login_test(request):
         return render(request, 'videosr/login_test.html', {'logined_user_credit': logined_user_credit})
 
 def delete_account(request):
+    # TODO: objects.filter가 찾지 못했을 때, 예외처리
     UserSocialAuth.objects.filter(user=request.user).delete()
     User.objects.filter(pk=request.user.pk).delete()
+    Customer.objects.filter(user=request.user).delete()
     return redirect('login_test')
 
 def payment_test(request):
