@@ -12,6 +12,7 @@ import prosr
 import skimage.io as io
 import torch
 import sys
+import shutil
 
 from pprint import pprint
 from prosr import Phase
@@ -147,16 +148,22 @@ class Infmodule_proSR:
         fps = self._video_to_frame(lr_video_path)
         fn = ntpath.basename(lr_video_path)
         self._inference_video("./tmp/" + fn , "./tmp/srtmp_"+fn + "/")
-        self._frame_to_video(fps=fps,lr_video_path= "./tmp/" +"srtmp_"+ fn + "/", sr_video_path=sr_video_path +"sr_"+ fn)
+        #self._frame_to_video(fps=fps,lr_video_path= "./tmp/" +"srtmp_"+ fn + "/", sr_video_path=sr_video_path +"sr_"+ fn)
+
+        self._frame_to_video_woaudio(fps=fps,lr_video_path= "./tmp/" +"srtmp_"+ fn + "/", sr_video_path=sr_video_path +"sr_"+ fn)
+        shutil.rmtree("./tmp/" + fn,ignore_errors=True)
+        shutil.rmtree("./tmp/srtmp_"+fn,ignore_errors=True )
 
     def sr_video_nosr(self,lr_video_path,sr_video_path):
         fps = self._video_to_frame(lr_video_path)
         fn = ntpath.basename(lr_video_path)
         self._infvideo_fake("./tmp/" + fn , "./tmp/srtmp_"+fn + "/")
         self._frame_to_video_woaudio(fps=fps,lr_video_path= "./tmp/" +"srtmp_"+ fn + "/", sr_video_path=sr_video_path +"sr_"+ fn)
+        shutil.rmtree("./tmp/" + fn,ignore_errors=True)
+        shutil.rmtree("./tmp/srtmp_"+fn,ignore_errors=True )
 
 if __name__ == '__main__':
-    srm = Infmodule_proSR(model_path="./model/proSRs_x4.pth", is_CUDA=False) #cuda -> is_CUDA=True
+    srm = Infmodule_proSR(model_path="./model/proSRs.pth", is_CUDA=False) #cuda -> is_CUDA=True
     lr = input("asdf: ")
     print("base filename : "+ ntpath.basename(lr))
     srm.sr_video_nosr(lr,"./output/")
