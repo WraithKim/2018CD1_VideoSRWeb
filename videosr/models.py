@@ -2,9 +2,11 @@ from django.db import models
 from django.utils import timezone
 
 class UploadedFile(models.Model):
+    PENDING = 'PE'
     IN_PROGRESS = 'IP'
     FINISHED = 'FI'
     STATUS_CODES = (
+        (PENDING, 'Pending'),
         (IN_PROGRESS, 'In progress'),
         (FINISHED, 'Finished'),
     )
@@ -19,7 +21,7 @@ class UploadedFile(models.Model):
     progress_status = models.CharField(
         max_length=2,
         choices=STATUS_CODES,
-        default=IN_PROGRESS,
+        default=PENDING,
     )
 
     def __str__(self):
@@ -28,7 +30,7 @@ class UploadedFile(models.Model):
 
 class Customer(models.Model):
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-    credit = models.PositiveIntegerField()
+    credit = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.user + ',' + self.credit

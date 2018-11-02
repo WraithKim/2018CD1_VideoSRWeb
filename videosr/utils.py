@@ -36,8 +36,9 @@ def upload_file(name, path, size):
         new_file = UploadedFile.objects.create(uploaded_file=new_name,
                                                uploaded_file_size=size,
                                                uploaded_filename=name)
-        new_file.save()
         return new_file
+    else:
+        return None
 
 def is_valid_file_request(request_post):
     """validate file upload request from nginx

@@ -20,4 +20,4 @@ def create_customer_model(sender, instance, created, **kwargs):
     """create customer model when user is created
     """
     if created:
-        Customer.objects.create(user=instance, credit=0)
+        Customer.objects.create(user=instance)

@@ -100,6 +100,8 @@ $(function () {
 
     add: function (e, data) {
       $('#filename').text(data.files[0].name);
+      console.log("sessionid: "+getCookie('sessionid'));
+      console.log("Session_ID: "+getCookie('sessionid')+hash(filename, 16384));
       // Cancel this specific upload when this button is clicked
 
       // add headers you need

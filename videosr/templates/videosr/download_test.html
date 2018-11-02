@@ -5,9 +5,32 @@
 
 {% block content %}
     <h1>Download Test</h1>
-    {% for file in files %}
-        <a href="{% url 'download_file' pk=file.pk %}" download>{{ file }}</a><a href="{% url 'delete_file' pk=file.pk %}"><i class="fas fa-trash-alt" style="font-size:12px;color:red;padding:4px;"></i></a><br>
-    {% endfor %}
+    {% if files %}
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Size</th>
+                <th>Progress</th>
+                <th>Delete</th>
+            </tr>
+            {% for file in files %}
+            <tr>
+                <td>
+                    <a href="{% url 'download_file' pk=file.pk %}" download>{{ file.uploaded_filename }}</a>
+                </td>
+                <td>{{ file.uploaded_file_size }}</td>
+                <td>{{ file.progress_status }}</td>
+                <td>
+                    <a href="{% url 'delete_file' pk=file.pk %}">
+                        <i class="fas fa-trash-alt" style="font-size:12px;color:red;padding:4px;"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No uploaded file</p>
+    {% endif %}
     <hr>
     <a href="{% url 'index' %}">Back to the index</a>
 {% endblock %}

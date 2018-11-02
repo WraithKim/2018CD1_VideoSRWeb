@@ -11,7 +11,7 @@ from .models import UploadedFile, Customer
 from .forms import UploadedFileForm
 from .utils import upload_file, is_valid_file_request
 import urllib.parse, logging, os
-import random, json,requests, pika, datetime
+import random, json, requests, pika, datetime
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,24 @@ def upload_complete(request):
 
         # maybe authentication here
 
-        upload_file(name=filename, path=path, size=size)
+        new_file = upload_file(name=filename, path=path, size=size)
+        if new_file is not None:
+            # enqueue this file in message queue
+            # TODO: 수정중
+            message_body = "{} {} {}".format(new_file.pk, "test1", "test2")
+            connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+            channel = connection.channel()
+            channel.queue_declare(queue='sr_queue', durable=True)
+            channel.basic_publish(exchange='',
+                            routing_key='sr_queue',
+                            body=message_body,
+                            properties=pika.BasicProperties(
+                                delivery_mode = 2, # make message persistent
+                                content_type = 'text/plain',
+                                content_encoding='utf-8',
+                            ))
+            logger.debug("Send MQ: '{}'".format(message_body))
+            connection.close()
 
         # TODO: research for redirect that out of order.
         return HttpResponse(status=200)
@@ -114,10 +131,13 @@ def mq_send(request):
     nowtime = datetime.datetime.now()
     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     channel = connection.channel()
-    channel.queue_declare(queue='hello')
+    channel.queue_declare(queue='task_queue', durable=True)
     channel.basic_publish(exchange='',
-                    routing_key='hello',
-                    body='{}'.format(str(nowtime))
+                    routing_key='task_queue',
+                    body='{}'.format(str(nowtime),
+                    properties=pika.BasicProperties(
+                         delivery_mode = 2, # make message persistent
+                    ))
     )
     logger.debug("[x] Sent '{}'".format(str(nowtime)))
     connection.close()
