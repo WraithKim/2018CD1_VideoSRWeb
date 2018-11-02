@@ -163,8 +163,11 @@ class Infmodule_proSR:
         shutil.rmtree("./tmp/srtmp_"+fn,ignore_errors=True )
 
 if __name__ == '__main__':
-    srm = Infmodule_proSR(model_path="./model/proSRs.pth", is_CUDA=False) #cuda -> is_CUDA=True
+    srm2 = Infmodule_proSR(model_path="./model/proSRs.pth", is_CUDA=False,upscale_factor=2) #cuda -> is_CUDA=True upscale x2
+    srm4 = Infmodule_proSR(model_path="./model/proSRs.pth", is_CUDA=False,upscale_factor=4) #cuda -> is_CUDA=True upscale x4
+
     lr = input("asdf: ")
     print("base filename : "+ ntpath.basename(lr))
-    srm.sr_video_nosr(lr,"./output/")
+    srm2.sr_video(lr,"./output/") # upscale x2
+    #srm4.sr_video(lr,"./output/") # upcale x4
     #srm.sr_video(lr,"./output/") # uncomment if you use sr
