@@ -8,3 +8,7 @@ torchvision
 opencv-python
 pillow
 numpy
+easydict
+tqdm
+scikit-image
+

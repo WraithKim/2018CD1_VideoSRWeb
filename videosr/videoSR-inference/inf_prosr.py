@@ -168,6 +168,6 @@ if __name__ == '__main__':
 
     lr = input("asdf: ")
     print("base filename : "+ ntpath.basename(lr))
-    # srm2.sr_video(lr,"./output/") # upscale x2
-    srm4.sr_video(lr,"./output/") # upcale x4
+    srm2.sr_video(lr,"./output/") # upscale x2
+    #srm4.sr_video(lr,"./output/") # upcale x4
     #srm.sr_video(lr,"./output/") # uncomment if you use sr
