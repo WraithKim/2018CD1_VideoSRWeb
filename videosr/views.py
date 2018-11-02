@@ -32,8 +32,12 @@ def upload_complete(request):
         new_file = upload_file(name=filename, path=path, size=size)
         if new_file is not None:
             # enqueue this file in message queue
-            # TODO: 수정중
-            message_body = "{} {} {}".format(new_file.pk, "test1", "test2")
+            # TODO: 나중에 대쉬보드 만들때 배율 옵션도 추가해야 함.
+            message_body = "{} {} {} {}".format(
+                new_file.pk, 
+                settings.MEDIA_ROOT + new_file.uploaded_file.name, 
+                settings.MEDIA_ROOT + "uploads",
+                2)
             connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
             channel = connection.channel()
             channel.queue_declare(queue='sr_queue', durable=True)
