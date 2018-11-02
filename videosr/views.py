@@ -11,7 +11,7 @@ from .models import UploadedFile, Customer
 from .forms import UploadedFileForm
 from .utils import upload_file, is_valid_file_request
 import urllib.parse, logging, os
-import random, json,requests
+import random, json,requests, pika, datetime
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +30,7 @@ def upload_complete(request):
         # maybe authentication here
 
         upload_file(name=filename, path=path, size=size)
+
         # TODO: research for redirect that out of order.
         return HttpResponse(status=200)
     # if validation failed, remove uploaded file
@@ -105,3 +106,18 @@ def payment_success(request, amount):
     curCustomer.save()
 
     return render(request, 'videosr/payment_success.html', {'credit' : curCustomer.credit})
+
+def mq_test(request):
+    return render(request, 'videosr/mq_test.html')
+
+def mq_send(request):
+    nowtime = datetime.datetime.now()
+    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    channel = connection.channel()
+    channel.queue_declare(queue='hello')
+    channel.basic_publish(exchange='',
+                    routing_key='hello',
+                    body='{}'.format(str(nowtime))
+    )
+    logger.debug("[x] Sent '{}'".format(str(nowtime)))
+    connection.close()
