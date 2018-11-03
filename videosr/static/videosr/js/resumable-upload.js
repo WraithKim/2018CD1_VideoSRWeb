@@ -24,8 +24,7 @@ $(function () {
     return hash(filename, 16384);
   };
 
-  // TODO: 업로드 취소 구현
-  var calculateProgress, cancelUpload, setProgressBar, startUpload, uploaded_data;
+  var calculateProgress, setProgressBar, setProgressBarFailed, setProgressBarSuccess, startUpload, uploaded_data;
   /*
    * A simple method to calculate the progress for a file upload.
    */
@@ -58,6 +57,26 @@ $(function () {
   }
 
   /*
+  * Set progress bar style when upload has failed
+  */
+  setProgressBarFailed = function () {
+    $('#progress').addClass('bg-danger');
+    setProgressBar(100)
+    $('#progress').text(`Upload Rejected from server`);
+  }
+
+  /*
+  * Set progress bar style when upload has successed
+  */
+  setProgressBarSuccess = function () {
+    $('#progress').addClass('bg-success');
+    setProgressBar(100)
+    $('#progress').text(`Upload Complete`);
+  }
+
+
+
+  /*
   * Get cookie from user.
   * Use this function to get csrf token.
   */
@@ -83,30 +102,19 @@ $(function () {
   });
 
   $('#resumable-upload').fileupload({
-    // nginx's upload module responds to these requests with a simple
-    // byte range value (like "0-2097152/3892384590"), so we shouldn't
-    // try to parse that response as the default JSON dataType
-    dataType: 'text',
-    // upload <maxChunkSize> bytes at a time, by the benchmark, 256KB may be best.
-    maxChunkSize: 256 * 1024,
-    // very importantly, the nginx upload module *does not allow*
-    // resumable uploads for a Content-Type of "multipart/form-data"
-    multipart: false,
-
     maxNumberOfFiles: 1,
     maxFileSize: 4 * 1000 * 1000 * 1000,
+    // https://github.com/fdintino/nginx-upload-module/issues/106
+    // By this issue, you should send chunk one by on in order.
     sequentialUploads: true,
-    // acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i
+    acceptFileTypes: /(\.|\/)(avi|mp4|mov|wmv|flv)$/i,
 
     add: function (e, data) {
       $('#filename').text(data.files[0].name);
-      console.log("sessionid: "+getCookie('sessionid'));
-      console.log("Session_ID: "+getCookie('sessionid')+hash(filename, 16384));
-      // Cancel this specific upload when this button is clicked
 
       // add headers you need
       data.headers || (data.headers = {});
-      data.headers['Session-ID'] = sessionId(data.files[0].name);
+      // data.headers['Session-ID'] = sessionId(data.files[0].name);
       data.headers['X-CSRFToken'] = getCookie('csrftoken');
 
       var progress = calculateProgress(data);
@@ -115,7 +123,13 @@ $(function () {
     },
 
     done: function (e, data) {
-      setProgressBar(100);
+      // if you want to see status code, use "var status = data.jqXHR.status;"
+      setProgressBarSuccess()
+    },
+
+    fail: function (e, data) {
+      // if you want to see status code, use "var status = data.jqXHR.status;"
+      setProgressBarFailed()
     },
 
     progress: function (e, data) {

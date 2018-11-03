@@ -26,10 +26,11 @@ def upload_complete(request):
         size = request.POST.get('uploaded_file.size')
         # Filename is encoded to url when jQuery-File-Upload send the file.
         filename = urllib.parse.unquote(request.POST.get('uploaded_file.name'))
+        version = request.POST.get('uploaded_file.md5')
 
         # maybe authentication here
 
-        new_file = upload_file(name=filename, path=path, size=size)
+        new_file = upload_file(name=filename, version=version, path=path, size=size)
         if new_file is not None:
             # enqueue this file in message queue
             # TODO: 나중에 대쉬보드 만들때 배율 옵션도 추가해야 함.
@@ -51,8 +52,6 @@ def upload_complete(request):
                             ))
             logger.debug("Send MQ: '{}'".format(message_body))
             connection.close()
-
-        # TODO: research for redirect that out of order.
         return HttpResponse(status=200)
     # if validation failed, remove uploaded file
     path = request.POST.get('uploaded_file.path')
