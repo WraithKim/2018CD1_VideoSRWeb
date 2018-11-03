@@ -27,10 +27,11 @@ def upload_complete(request):
         # Filename is encoded to url when jQuery-File-Upload send the file.
         filename = urllib.parse.unquote(request.POST.get('uploaded_file.name'))
         version = request.POST.get('uploaded_file.md5')
+        scale_factor = int(request.POST.get('scale_factor'))
 
         # maybe authentication here
 
-        new_file = upload_file(name=filename, version=version, path=path, size=size)
+        new_file = upload_file(name=filename, scale_factor=scale_factor, version=version, path=path, size=size)
         if new_file is not None:
             # enqueue this file in message queue
             # TODO: 나중에 대쉬보드 만들때 배율 옵션도 추가해야 함.
@@ -38,7 +39,7 @@ def upload_complete(request):
                 new_file.pk, 
                 settings.MEDIA_ROOT + new_file.uploaded_file.name, 
                 settings.MEDIA_ROOT + "uploads",
-                2)
+                scale_factor)
             connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
             channel = connection.channel()
             channel.queue_declare(queue='sr_queue', durable=True)

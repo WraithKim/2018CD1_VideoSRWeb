@@ -10,6 +10,7 @@
             <tr>
                 <th>Name</th>
                 <th>Size</th>
+                <th>Scale</th>
                 <th>Progress</th>
                 <th>Delete</th>
             </tr>
@@ -19,6 +20,7 @@
                     <a href="{% url 'download_file' pk=file.pk %}" download>{{ file.uploaded_filename }}</a>
                 </td>
                 <td>{{ file.uploaded_file_size }}</td>
+                <td>{{ file.scale_factor }}</td>
                 <td>{{ file.progress_status }}</td>
                 <td>
                     <a href="{% url 'delete_file' pk=file.pk %}">

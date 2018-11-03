@@ -19,12 +19,13 @@ def move_upload_to_storage(source, dst):
     shutil.move(source, new_path)
     return new_path
 
-def upload_file(name, path, version, size):
+def upload_file(name, path, scale_factor, version, size):
     """save uploaded file as UploadedFile Model and move to storage.
 
     Arguments:
         name {str} -- the name of file from request object
         path {str} -- the path to the file uploaded (in nginx module)
+        scale_factor {int} -- the scale factor of SR
         version {str} -- the md5 sum of the file
         size {str} -- the file size.
     
@@ -36,6 +37,7 @@ def upload_file(name, path, version, size):
         new_name = os.path.join('uploads', str(uuid.uuid4()))
         move_upload_to_storage(path, new_name)
         new_file = UploadedFile.objects.create(uploaded_file=new_name,
+                                               scale_factor=scale_factor,
                                                uploaded_file_size=size,
                                                uploaded_file_version=version,
                                                uploaded_filename=name)
@@ -54,8 +56,11 @@ def is_valid_file_request(request_post):
         size = request_post.get('uploaded_file.size')
         filename = request_post.get('uploaded_file.name')      
         version = request_post.get('uploaded_file.md5')
+        scale_factor = request_post.get('scale_factor')
 
-        if not path or not size or not filename or not version:
+        if not all([path, size, filename, version, scale_factor]):
+            return False
+        if scale_factor != "2" and scale_factor != "4":
             return False
         if not os.path.isfile(path):
             return False

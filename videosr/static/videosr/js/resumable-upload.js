@@ -1,29 +1,4 @@
 $(function () {
-  var hash, sessionId;
-
-  /*
-  * Hash function for generate 'session-id' header
-  */
-  hash = function (s, tableSize) {
-    var a, b, h, i, j, ref;
-    b = 27183;
-    h = 0;
-    a = 31415;
-    for (i = j = 0, ref = s.length;
-      (0 <= ref ? j < ref : j > ref); i = 0 <= ref ? ++j : --j) {
-      h = (a * h + s[i].charCodeAt()) % tableSize;
-      a = ((a % tableSize) * (b % tableSize)) % tableSize;
-    }
-    return h;
-  };
-
-  /*
-  * Generate session-id using hash function
-  */
-  sessionId = function (filename) {
-    return hash(filename, 16384);
-  };
-
   var calculateProgress, setProgressBar, setProgressBarFailed, setProgressBarSuccess, startUpload, uploaded_data;
   /*
    * A simple method to calculate the progress for a file upload.
@@ -43,10 +18,13 @@ $(function () {
     if (uploaded_data) {
       // reset, if upload process has interrupted. (can resume soon cause nginx-upload-module will respond with where to resume.)
       uploaded_data.data = null;
+      uploaded_data.formData = {
+        scale_factor: $("input[type='radio'][name='scale_factor']:checked").val(),
+        csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val()
+      }
       uploaded_data.submit();
     }
   };
-
 
   /*
   * Set progress bar with given progress(number)
@@ -74,8 +52,6 @@ $(function () {
     $('#progress').text(`Upload Complete`);
   }
 
-
-
   /*
   * Get cookie from user.
   * Use this function to get csrf token.
@@ -94,14 +70,16 @@ $(function () {
         }
     }
     return cookieValue;
-  } 
+  }
 
-  // Start/Resume this specific upload when this button is clicked
+  /*
+  * Start/Resume this specific upload when this button is clicked
+  */
   $('#start_upload').click(function () {
     startUpload();
   });
 
-  $('#resumable-upload').fileupload({
+  $('#fileupload').fileupload({
     maxNumberOfFiles: 1,
     maxFileSize: 4 * 1000 * 1000 * 1000,
     // https://github.com/fdintino/nginx-upload-module/issues/106
@@ -113,11 +91,10 @@ $(function () {
       $('#filename').text(data.files[0].name);
 
       // add headers you need
-      data.headers || (data.headers = {});
-      // data.headers['Session-ID'] = sessionId(data.files[0].name);
-      data.headers['X-CSRFToken'] = getCookie('csrftoken');
+      // data.headers || (data.headers = {});
 
       var progress = calculateProgress(data);
+      $('#progress').attr('class', 'progress-bar');
       setProgressBar(progress);
       uploaded_data = data;
     },

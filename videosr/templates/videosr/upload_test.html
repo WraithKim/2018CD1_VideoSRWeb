@@ -7,12 +7,14 @@
     <h1>Upload Test</h1>
     <div>
         {% csrf_token %}
-        <span>File name: </span><label id="filename"></label><br>
+        <span>File name: <label id="filename"></label>
+            <input type="radio" name="scale_factor" value="2" checked="checked">x2
+            <input type="radio" name="scale_factor" value="4">x4
+        </span><br>
         <span class="btn btn-success fileinput-button">
             <i class="glyphicon glyphicon-plus"></i>
             <span>Add files...</span>
-            <input id="resumable-upload" type="file" name="uploaded_file" data-url="/upload/progress/" 
-            accept="video/*">
+            <input id="fileupload" type="file" name="uploaded_file" data-url="/upload/progress/">
         </span>
         <button id="start_upload" type="button" class="btn btn-primary">
             <span>Start upload</span>

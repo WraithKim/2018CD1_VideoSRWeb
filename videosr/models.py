@@ -11,12 +11,23 @@ class UploadedFile(models.Model):
         (FINISHED, 'Finished'),
     )
 
+    SCALE_2 = 2
+    SCALE_4 = 4
+    SCALE_FACTORS = (
+        (SCALE_2, 'x2'),
+        (SCALE_4, 'x4')
+    )
+
     uploaded_file = models.FileField()
     uploaded_date = models.DateTimeField(auto_now_add=True)
     uploaded_file_size = models.BigIntegerField()
     uploaded_file_version = models.CharField(max_length=255, null=True)
     # This field is real file name. Be aware of that 'uploaded_file.name' is '/path/to/file/uploaded_file_version'
     uploaded_filename = models.CharField(max_length=255)
+    scale_factor = models.SmallIntegerField(
+        choices=SCALE_FACTORS,
+        default=SCALE_2,
+    )
     progress_status = models.CharField(
         max_length=2,
         choices=STATUS_CODES,
