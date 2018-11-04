@@ -1,6 +1,7 @@
 from .models import UploadedFile
 from django.conf import settings
 import os, shutil, logging, uuid
+import subprocess
 
 logger = logging.getLogger(__name__)
 
@@ -66,8 +67,17 @@ def is_valid_file_request(request_post):
             return False
         if len(filename) > 255:
             return False
+        # check video format
+        video_resolution = subprocess.check_output(
+            ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=coded_width,coded_height", "-of", "csv=e=none:p=0", path], universal_newlines=True).split(",")
+        if int(video_resolution[0]) > 858 or int(video_resolution[1]) > 480:
+            logger.error("The resolution of file {} is too large. ({}, {})".format(path, video_resolution[0], video_resolution[1]))
+            return False
     except KeyError:
         return False
-    
-    return True
+    except subprocess.CalledProcessError as e:
+        logger.error(e)
+        return False
+    else:
+        return True
     
