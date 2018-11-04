@@ -11,6 +11,21 @@ $(function () {
     return value;
   };
 
+  function validate(data) {
+    var maxFileSize = 4 * 1000 * 1000 * 1000,
+    // acceptFileTypes follow 'accept' attribute in <input type="file"> form.
+    acceptFileTypes = /^video\//i;
+    if (data.files[0]['size'] > maxFileSize){
+      setProgressBarFailed("File size too large");
+      return false;
+    }
+    if (!acceptFileTypes.test(data.files[0]['type'])){
+      setProgressBarFailed("Not supported file type");
+      return false;
+    }
+    return true;
+  }
+
   /*
    * Starts the upload for a file in uploaded_data container.
    */
@@ -37,39 +52,19 @@ $(function () {
   /*
   * Set progress bar style when upload has failed
   */
-  setProgressBarFailed = function () {
+  setProgressBarFailed = function (message) {
     $('#progress').addClass('bg-danger');
-    setProgressBar(100)
-    $('#progress').text(`Upload Rejected from server`);
+    setProgressBar(100);
+    $('#progress').text(message);
   }
 
   /*
   * Set progress bar style when upload has successed
   */
-  setProgressBarSuccess = function () {
+  setProgressBarSuccess = function (message) {
     $('#progress').addClass('bg-success');
-    setProgressBar(100)
-    $('#progress').text(`Upload Complete`);
-  }
-
-  /*
-  * Get cookie from user.
-  * Use this function to get csrf token.
-  */
-  function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie != '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
+    setProgressBar(100);
+    $('#progress').text(message);
   }
 
   /*
@@ -81,36 +76,36 @@ $(function () {
 
   $('#fileupload').fileupload({
     maxNumberOfFiles: 1,
-    maxFileSize: 4 * 1000 * 1000 * 1000,
     // https://github.com/fdintino/nginx-upload-module/issues/106
     // By this issue, you should send chunk one by on in order.
     sequentialUploads: true,
-    acceptFileTypes: /(\.|\/)(avi|mp4|mov|wmv|flv)$/i,
+    // maxFileSize and acceptFileTypes are only supported by the UI Version
+    // so I will use these validation in validate() manually.
 
     add: function (e, data) {
       $('#filename').text(data.files[0].name);
-
-      // add headers you need
-      // data.headers || (data.headers = {});
-
-      var progress = calculateProgress(data);
-      $('#progress').attr('class', 'progress-bar');
-      setProgressBar(progress);
-      uploaded_data = data;
+      if (validate(data)) {
+        var progress = calculateProgress(data);
+        $('#progress').attr('class', 'progress-bar');
+        setProgressBar(progress);
+        uploaded_data = data;
+      } else {
+        uploaded_data = undefined;
+      }
     },
 
     done: function (e, data) {
       // if you want to see status code, use "var status = data.jqXHR.status;"
-      setProgressBarSuccess()
+      setProgressBarSuccess(`Upload Complete`);
     },
 
     fail: function (e, data) {
       // if you want to see status code, use "var status = data.jqXHR.status;"
-      setProgressBarFailed()
+      setProgressBarFailed(`Upload Rejected from server`);
     },
 
     progress: function (e, data) {
-      setProgressBar(calculateProgress(data))
+      setProgressBar(calculateProgress(data));
     }
   });
 });
