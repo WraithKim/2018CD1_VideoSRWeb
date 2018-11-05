@@ -15,4 +15,5 @@ urlpatterns = [
     path('payment/<amount>/success/',views.payment_success, name='payment_success'),
     path('mq/', views.mq_test, name='mq_test'),
     path('mq/send/', views.mq_send, name='mq_send'),
+    path('payment/fail/',views.payment_fail, name='payment_fail'),
 ]

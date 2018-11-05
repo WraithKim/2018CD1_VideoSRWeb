@@ -119,6 +119,7 @@ def payment_request(request, amount):
         "expiredTime":"2015-07-20 16:21:00",
         "resultCallback": "https://myshop.com/toss/result.php",
         "retUrl": "https://videosr.koreacentral.cloudapp.azure.com/payment/"+ amount + "/success/",
+        "retCancelUrl": "https://videosr.koreacentral.cloudapp.azure.com/payment/fail/",
         "cashRecipt": False
     }
 
@@ -154,3 +155,7 @@ def mq_send(request):
     )
     logger.debug("[x] Sent '{}'".format(str(nowtime)))
     connection.close()
+
+def payment_fail(request):
+    curCustomer = Customer.objects.get(user=request.user)
+    return render(request, 'videosr/payment_fail.html', {'credit' : curCustomer.credit})
