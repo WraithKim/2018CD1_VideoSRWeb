@@ -20,10 +20,11 @@ def move_upload_to_storage(source, dst):
     shutil.move(source, new_path)
     return new_path
 
-def upload_file(name, path, scale_factor, version, size):
+def upload_file(owner, name, path, scale_factor, version, size):
     """save uploaded file as UploadedFile Model and move to storage.
 
     Arguments:
+        owner {auth.User} -- file owner
         name {str} -- the name of file from request object
         path {str} -- the path to the file uploaded (in nginx module)
         scale_factor {int} -- the scale factor of SR
@@ -35,9 +36,10 @@ def upload_file(name, path, scale_factor, version, size):
     """
     if os.path.exists(path):
         # 같은 파일에 대해 겹치는 것을 방지하기 위해 uuid로 변환함.
-        new_name = os.path.join('uploads', str(uuid.uuid4()))
+        new_name = os.path.join('uploads', str(owner.pk), str(uuid.uuid4()))
         move_upload_to_storage(path, new_name)
-        new_file = UploadedFile.objects.create(uploaded_file=new_name,
+        new_file = UploadedFile.objects.create(owner = owner,
+                                               uploaded_file=new_name,
                                                scale_factor=scale_factor,
                                                uploaded_file_size=size,
                                                uploaded_file_version=version,

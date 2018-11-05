@@ -18,6 +18,7 @@ class UploadedFile(models.Model):
         (SCALE_4, 'x4')
     )
 
+    owner = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     uploaded_file = models.FileField()
     uploaded_date = models.DateTimeField(auto_now_add=True)
     uploaded_file_size = models.BigIntegerField()

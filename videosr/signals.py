@@ -1,5 +1,6 @@
 from .models import UploadedFile
 from .models import Customer
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
@@ -16,8 +17,9 @@ def delete_uploaded_file(sender, instance, *args, **kwargs):
         os.remove(path)
 
 @receiver(post_save, sender=User, dispatch_uid='create_user_signal')
-def create_customer_model(sender, instance, created, **kwargs):
-    """create customer model when user is created
+def create_additional_user_info(sender, instance, created, **kwargs):
+    """create customer model and user directory when user is created
     """
     if created:
         Customer.objects.create(user=instance)
+        os.mkdir(os.path.join(settings.MEDIA_ROOT, "uploads", str(instance.pk)))

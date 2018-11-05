@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import pika, psycopg2
+import sys, pika, psycopg2
 import json, logging, logging.config, time
 # from inf_prosr import Infmodule_proSR
 
@@ -13,6 +13,16 @@ with open(PROJECT_DIR + 'videosr/videoSR-inference/logging.json', 'r') as f:
 logging.config.dictConfig(logConfig)
 
 logger = logging.getLogger("sr_adapter")
+
+# 이 프로그램에서 발생한 처리되지 않은 예외를 로그로 기록함.
+def handle_exception(exc_type, exc_value, exc_traceback):
+    if issubclass(exc_type, KeyboardInterrupt):
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+
+    logger.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
+
+sys.excepthook = handle_exception
 
 # db config
 with open(PROJECT_DIR + 'config.json', 'r') as f:
@@ -53,14 +63,16 @@ class SRDefaultWebAdapter:
 
     def _callback_mq(self, ch, method, properties, body):
 
+        #### SR 모듈에서 발생한 에러는 심각한 것이므로 관리자가 해결해야 함. 따라서 예외처리하지 않고 로그로만 남김.
+
         ### 메세지 처리
         logger.info("Received %r" % body)
         # list[0] = file_id, list[1] = 처리할 파일 경로, list[2] = 처리 후 결과물 dir, list[3] = scale factor
         decoded_body = body.decode('utf-8')
         file_info_list = decoded_body.split(" ")
-
         file_id = int(file_info_list[0])
         scale_factor = int(file_info_list[3])
+
         time.sleep(10) # FIXME: Test용 코드
         self._update_state(file_id, "IP")
         if scale_factor == 2:
@@ -70,6 +82,7 @@ class SRDefaultWebAdapter:
             logger.info("SR x4 start file: {}".format(file_id))
             # self.srm_scale4.sr_video_nosr(file_info_list[1], file_info_list[2])
         time.sleep(30) # FIXME: Test용 코드
+
         self._update_state(file_id, "FI")
         logger.info("file id {} Done".format(file_id))
         ### 메세지 처리 끝

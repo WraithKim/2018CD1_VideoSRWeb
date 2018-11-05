@@ -126,6 +126,7 @@ AUTHENTICATION_BACKENDS = [
 # social login url settings
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
+LOGIN_URL='login_test'
 LOGIN_REDIRECT_URL='login_test'
 LOGOUT_REDIRECT_URL='login_test'
 

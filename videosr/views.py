@@ -21,6 +21,10 @@ def index(request):
 
 @require_POST
 def upload_complete(request):
+    # Use raw logged-in user access, because @login_required only redirect setting.LOGIN_URL
+    # We need to send http error status code to JS upload module.
+    if not request.user.is_authenticated:
+        return HttpResponse(status=401)
     if is_valid_file_request(request.POST):
         path = request.POST.get('uploaded_file.path')
         size = request.POST.get('uploaded_file.size')
@@ -28,17 +32,19 @@ def upload_complete(request):
         filename = urllib.parse.unquote(request.POST.get('uploaded_file.name'))
         version = request.POST.get('uploaded_file.md5')
         scale_factor = int(request.POST.get('scale_factor'))
-
-        # maybe authentication here
-
-        new_file = upload_file(name=filename, scale_factor=scale_factor, version=version, path=path, size=size)
+        new_file = upload_file(owner=request.user,
+                                name=filename,
+                                scale_factor=scale_factor,
+                                version=version,
+                                path=path,
+                                size=size)
         if new_file is not None:
+            new_file_path = settings.MEDIA_ROOT + new_file.uploaded_file.name
             # enqueue this file in message queue
-            # TODO: 나중에 대쉬보드 만들때 배율 옵션도 추가해야 함.
             message_body = "{} {} {} {}".format(
-                new_file.pk, 
-                settings.MEDIA_ROOT + new_file.uploaded_file.name, 
-                settings.MEDIA_ROOT + "uploads",
+                new_file.pk,
+                new_file_path,
+                os.path.dirname(new_file_path) + os.sep,
                 scale_factor)
             connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
             channel = connection.channel()
@@ -63,19 +69,22 @@ def upload_complete(request):
 def upload_test(request):
     return render(request, 'videosr/upload_test.html')
 
+@login_required
 def download_test(request):
-    uploaded_files = UploadedFile.objects.all()
+    uploaded_files = UploadedFile.objects.filter(owner=request.user)
     return render(request, 'videosr/download_test.html', { 'files' : uploaded_files })
 
+@login_required
 def download_file(request, pk):
-    file_to_download = get_object_or_404(UploadedFile, pk=pk)
+    file_to_download = get_object_or_404(UploadedFile, pk=pk, owner=request.user)
     response = HttpResponse()
     response['Content-Disposition'] = 'attachment; filename={0}'.format(urllib.parse.quote(file_to_download.uploaded_filename))
     response['X-Accel-Redirect'] = '/media/{0}'.format(file_to_download.uploaded_file.name)
     return response
 
+@login_required
 def delete_file(request, pk):
-    file_to_delete = get_object_or_404(UploadedFile, pk=pk)
+    file_to_delete = get_object_or_404(UploadedFile, pk=pk, owner=request.user)
     file_to_delete.delete()
     return redirect('download_test')
 
