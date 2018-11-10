@@ -5,8 +5,7 @@
 
 {% block content %}
     {% if user.is_authenticated %}
-        <p1> 결제가 실패하였습니다 </p1>
-        <p> 현재 크래딧은 {{ credit }} 입니다.</p>
+        <h1> 결제가 실패하였습니다 </h1>
     {% else %}
         <p>You are not logged in</p>
     {% endif %}

@@ -5,6 +5,7 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
+from django.db import DatabaseError, transaction
 
 from social_django.models import UserSocialAuth
 from .models import UploadedFile, Customer
@@ -25,19 +26,43 @@ def upload_complete(request):
     # We need to send http error status code to JS upload module.
     if not request.user.is_authenticated:
         return HttpResponse(status=401)
-    if is_valid_file_request(request.POST):
+    if not is_valid_file_request(request.POST):
+        # if validation failed, remove uploaded file
+        # TODO: 400을 반환하면 파일이 nginx에 의해 삭제되는지 확인해야 함.
         path = request.POST.get('uploaded_file.path')
-        size = request.POST.get('uploaded_file.size')
-        # Filename is encoded to url when jQuery-File-Upload send the file.
-        filename = urllib.parse.unquote(request.POST.get('uploaded_file.name'))
-        version = request.POST.get('uploaded_file.md5')
-        scale_factor = int(request.POST.get('scale_factor'))
-        new_file = upload_file(owner=request.user,
-                                name=filename,
-                                scale_factor=scale_factor,
-                                version=version,
-                                path=path,
-                                size=size)
+        if path and os.path.isfile(path):
+            os.remove(path)
+        return HttpResponse(status=400)
+
+    path = request.POST.get('uploaded_file.path')
+    size = request.POST.get('uploaded_file.size')
+    # Filename is encoded to url when jQuery-File-Upload send the file.
+    filename = urllib.parse.unquote(request.POST.get('uploaded_file.name'))
+    version = request.POST.get('uploaded_file.md5')
+    scale_factor = int(request.POST.get('scale_factor'))
+    
+    try:
+        with transaction.atomic():
+            if UploadedFile.objects.filter(owner__pk=request.user.pk).exists():
+                # alreay file uploaded. reject.
+                # TODO: 400을 반환하면 파일이 nginx에 의해 삭제되는지 확인해야 함.
+                path = request.POST.get('uploaded_file.path')
+                if path and os.path.isfile(path):
+                    os.remove(path)
+                return HttpResponse(status=400)
+            else:
+                # create new UploadedFile
+                new_file = upload_file(owner=request.user,
+                            name=filename,
+                            scale_factor=scale_factor,
+                            version=version,
+                            path=path,
+                            size=size)
+    except DatabaseError as de:
+        # TODO: 400에 의해 nginx가 파일을 삭제하지 않으면 삭제하도록 수정해야 함.
+        logger.error(de)
+        return HttpResponse(status=400)
+    else:
         if new_file is not None:
             new_file_path = settings.MEDIA_ROOT + new_file.uploaded_file.name
             # enqueue this file in message queue
@@ -60,11 +85,6 @@ def upload_complete(request):
             logger.debug("Send MQ: '{}'".format(message_body))
             connection.close()
         return HttpResponse(status=200)
-    # if validation failed, remove uploaded file
-    path = request.POST.get('uploaded_file.path')
-    if path and os.path.isfile(path):
-        os.remove(path)
-    return HttpResponse(status=400)
 
 def upload_test(request):
     return render(request, 'videosr/upload_test.html')
@@ -132,11 +152,16 @@ def payment_request(request, amount):
 def payment_success(request, amount):
 
     # DB에 amount에 해당하는 값 만큼 update
-    curCustomer = Customer.objects.get(user=request.user)
-    curCustomer.credit += int(amount)
-    curCustomer.save()
-
-    return render(request, 'videosr/payment_success.html', {'credit' : curCustomer.credit})
+    try:
+        with transaction.atomic():
+            curCustomer = Customer.objects.get(user=request.user)
+            curCustomer.credit += int(amount)
+            curCustomer.save()
+    except DatabaseError as e:
+        logger.error(e)
+        return redirect('payment_fail')
+    else:
+        return render(request, 'videosr/payment_success.html', {'credit' : curCustomer.credit})
 
 def mq_test(request):
     return render(request, 'videosr/mq_test.html')
@@ -157,5 +182,4 @@ def mq_send(request):
     connection.close()
 
 def payment_fail(request):
-    curCustomer = Customer.objects.get(user=request.user)
-    return render(request, 'videosr/payment_fail.html', {'credit' : curCustomer.credit})
+    return render(request, 'videosr/payment_fail.html')
