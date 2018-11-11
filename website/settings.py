@@ -129,9 +129,15 @@ AUTHENTICATION_BACKENDS = [
 # social login url settings
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
-LOGIN_URL='login_test'
-LOGIN_REDIRECT_URL='login_test'
-LOGOUT_REDIRECT_URL='login_test'
+# The URL where requests are redirected for login
+# especially when using the login_required() decorator.
+LOGIN_URL='login:index'
+# The URL where requests are redirected after login 
+# when the contrib.auth.login view gets no next parameter.
+LOGIN_REDIRECT_URL='dashboard:index'
+# The URL where requests are redirected after a user logs out 
+# using LogoutView (if the view doesn’t get a next_page argument).
+LOGOUT_REDIRECT_URL='login:index'
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
@@ -183,7 +189,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/home/wraithkim/videoSRWeb/log/debug.log',     
+            'filename': os.path.join(BASE_DIR, 'log','debug.log'),     
             'formatter': 'verbose',
             'maxBytes':1024*1024*10, 
             'backupCount':5,
