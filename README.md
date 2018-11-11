@@ -22,7 +22,7 @@
 - [x] 웹 서버 구축
 - [x] 회원 관리
 - [ ] UI
-- [ ] 결제 시스템(exception handling...)
+- [ ] 결제 시스템(exception handling... espacially double request(pay/spent) handling)
 - [x] 동영상 SR (But, Work in progress......performance is too low :-(  )
-- [ ] 웹-SR 모듈간 데이터 교환
-- [ ] 동영상 업로드/다운로드(format filtering...)
+- [x] 웹-SR 모듈간 데이터 교환
+- [x] 동영상 업로드/다운로드
