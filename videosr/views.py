@@ -28,10 +28,6 @@ def upload_complete(request):
         return HttpResponse(status=401)
     if not is_valid_file_request(request.POST):
         # if validation failed, remove uploaded file
-        # TODO: 400을 반환하면 파일이 nginx에 의해 삭제되는지 확인해야 함.
-        path = request.POST.get('uploaded_file.path')
-        if path and os.path.isfile(path):
-            os.remove(path)
         return HttpResponse(status=400)
 
     path = request.POST.get('uploaded_file.path')
@@ -45,11 +41,7 @@ def upload_complete(request):
         with transaction.atomic():
             if UploadedFile.objects.filter(owner__pk=request.user.pk).exists():
                 # alreay file uploaded. reject.
-                # TODO: 400을 반환하면 파일이 nginx에 의해 삭제되는지 확인해야 함.
-                path = request.POST.get('uploaded_file.path')
-                if path and os.path.isfile(path):
-                    os.remove(path)
-                return HttpResponse(status=400)
+                return HttpResponse("All user can upload only one video.", status=400)
             else:
                 # create new UploadedFile
                 new_file = upload_file(owner=request.user,
@@ -59,13 +51,13 @@ def upload_complete(request):
                             path=path,
                             size=size)
     except DatabaseError as de:
-        # TODO: 400에 의해 nginx가 파일을 삭제하지 않으면 삭제하도록 수정해야 함.
         logger.error(de)
-        return HttpResponse(status=400)
+        return HttpResponse(status=500)
     else:
         if new_file is not None:
             new_file_path = settings.MEDIA_ROOT + new_file.uploaded_file.name
             # enqueue this file in message queue
+            # FIXME: 큐 전송 부분에도 예외처리는 필요함.
             message_body = "{} {} {} {}".format(
                 new_file.pk,
                 new_file_path,
@@ -84,7 +76,7 @@ def upload_complete(request):
                             ))
             logger.debug("Send MQ: '{}'".format(message_body))
             connection.close()
-        return HttpResponse(status=200)
+        return HttpResponse("Upload complete", status=200)
 
 def upload_test(request):
     return render(request, 'videosr/upload_test.html')

@@ -96,12 +96,14 @@ $(function () {
 
     done: function (e, data) {
       // if you want to see status code, use "var status = data.jqXHR.status;"
-      setProgressBarSuccess(`Upload Complete`);
+      var responseText = data.jqXHR.responseText || "Upload Complete";
+      setProgressBarSuccess(responseText);
     },
 
     fail: function (e, data) {
       // if you want to see status code, use "var status = data.jqXHR.status;"
-      setProgressBarFailed(`Upload Rejected from server`);
+      var responseText = data.jqXHR.responseText || "Upload Rejected from server";
+      setProgressBarFailed(responseText);
     },
 
     progress: function (e, data) {
