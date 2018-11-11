@@ -1,0 +1,18 @@
+{% extends 'videosr/base.html' %}
+
+{% block style %}
+{% endblock %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        <h1> 결제가 실패하였습니다 </h1>
+    {% else %}
+        <p>You are not logged in</p>
+    {% endif %}
+    <hr>
+    <a href="{% url 'index' %}">Back to the index</a>
+
+{% endblock %}
+
+{% block script %}
+{% endblock %}

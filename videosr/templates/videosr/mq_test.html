@@ -1,0 +1,25 @@
+{% extends 'videosr/base.html' %}
+
+{% block style %}
+{% endblock %}
+
+{% block content %}
+    <h1>Message Queue Test</h1>
+    <button onclick="send_to_mq()" class="btn btn-default">Test</button>
+    <hr>
+    <a href="{% url 'index' %}">Back to the index</a>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+    function send_to_mq(){
+        const Http = new XMLHttpRequest();
+        const url='https://videosr.koreacentral.cloudapp.azure.com/mq/send';
+        Http.open("GET", url);
+        Http.send();
+        Http.onreadystatechange=(e)=>{
+            console.log(Http.responseText)
+        }
+    }
+</script>
+{% endblock %}
