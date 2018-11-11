@@ -10,8 +10,8 @@
         {% else %}
             <p>You have no credit infomation. Ask to admin.</p>
         {% endif %}
-        <a href="{% url 'test:logout' %}"><button class="btn btn-warning" style="width: 40%">Log Out</button></a>
-	    <a href="{% url 'test:delete_account' %}"><button class="btn btn-danger" style="width: 40%">Delete Account</button></a>
+        <a href="{% url 'logout' %}"><button class="btn btn-warning" style="width: 40%">Log Out</button></a>
+	    <a href="{% url 'delete_account' %}"><button class="btn btn-danger" style="width: 40%">Delete Account</button></a>
     {% else %}
         <p>You are not logged in</p>
         <a href="{% url "social:begin" "google-oauth2" %}"><button class="btn btn-danger" style="width: 40%">G+ Login</button></a>
