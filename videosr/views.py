@@ -98,7 +98,7 @@ def download_file(request, pk):
 def delete_file(request, pk):
     file_to_delete = get_object_or_404(UploadedFile, pk=pk, owner=request.user)
     file_to_delete.delete()
-    return redirect('download_test')
+    return redirect('test:download_test')
 
 def login_test(request):
     logined_user_credit = None
@@ -114,7 +114,7 @@ def delete_account(request):
     # TODO: objects.filter가 찾지 못했을 때, 예외처리
     UserSocialAuth.objects.filter(user=request.user).delete()
     User.objects.filter(pk=request.user.pk).delete()
-    return redirect('login_test')
+    return redirect('test:login_test')
 
 def payment_test(request):
     return render(request, 'videosr/payment_test.html')
@@ -151,7 +151,7 @@ def payment_success(request, amount):
             curCustomer.save()
     except DatabaseError as e:
         logger.error(e)
-        return redirect('payment_fail')
+        return redirect('test:payment_fail')
     else:
         return render(request, 'videosr/payment_success.html', {'credit' : curCustomer.credit})
 
