@@ -7,3 +7,10 @@ class Customer(models.Model):
 
     def __str__(self):
         return self.user + ',' + self.credit
+
+class Order(models.Model):
+    orderNo= models.PositiveIntegerField(default=0, primary_key=True)
+    payToken= models.CharField()
+
+    def __str__(self):
+        return self.orderNo + ',' + self.payToken
