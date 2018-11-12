@@ -130,8 +130,8 @@ class SRDefaultWebAdapter:
 
 
 def main():
-    # srm_scale2 = Infmodule_proSR(model_path=PROJECT_DIR+"model/proSRs_x2.pth", is_CUDA=False)
-    # srm_scale4 = Infmodule_proSR(model_path=PROJECT_DIR+"model/proSRs_x4.pth", is_CUDA=False)
+    # srm_scale2 = Infmodule_proSR(model_path=PROJECT_DIR+"model/proSR/proSR_x2.pth", is_CUDA=False)
+    # srm_scale4 = Infmodule_proSR(model_path=PROJECT_DIR+"model/proSR/proSR_x4.pth", is_CUDA=False)
     srm_scale2 = None
     srm_scale4 = None
     adapter = SRDefaultWebAdapter(srm_scale2, srm_scale4)
