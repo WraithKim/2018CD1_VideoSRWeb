@@ -9,7 +9,7 @@ class Customer(models.Model):
         return self.user + ',' + self.credit
 
 class Order(models.Model):
-    orderNo= models.PositiveIntegerField(default=0, primary_key=True)
+    orderNo= models.CharField(max_length=36, primary_key=True)
     payToken= models.CharField(max_length=23)
 
     def __str__(self):

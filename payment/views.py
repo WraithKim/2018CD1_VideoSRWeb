@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.db import DatabaseError, transaction
 from .models import Customer, Order
-import logging, random, json, requests, datetime
+import logging, random, json, requests, datetime, uuid
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ def index(request):
 @login_required
 def payment_request(request, amount):
     url = "https://pay.toss.im/api/v1/payments"
-    orderNo = random.randint(1000000000000,9999999999999)
+    orderNo = str(uuid.uuid4())
     params = {
         "orderNo": orderNo,
         #"orderNo": "2015072012411",
