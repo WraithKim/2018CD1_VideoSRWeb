@@ -10,7 +10,7 @@ class Customer(models.Model):
 
 class Order(models.Model):
     orderNo= models.PositiveIntegerField(default=0, primary_key=True)
-    payToken= models.CharField()
+    payToken= models.CharField(max_length=23)
 
     def __str__(self):
         return self.orderNo + ',' + self.payToken

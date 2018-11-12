@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.db import DatabaseError, transaction
-from .models import Customer
+from .models import Customer, Order
 import logging, random, json, requests, datetime
 
 logger = logging.getLogger(__name__)
@@ -34,9 +34,9 @@ def payment_request(request, amount):
     d = json.loads(r.text)
     if d['code'] == 0:
         # 디비에 값 업데이트
-        Order.objects.create(payToken=d[payToken],orderNo=orderNo)
+        Order.objects.create(payToken=d['payToken'],orderNo=orderNo)
         return HttpResponseRedirect(d['checkoutPage'])
-    else
+    else:
         return redirect('test:payment_fail')
 
 def payment_check(token):
