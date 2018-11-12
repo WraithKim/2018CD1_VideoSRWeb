@@ -1,0 +1,119 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}
+대쉬보드 - 화질구지
+{% endblock %}
+
+{% block style %}
+{% endblock %}
+
+{% block page-wrapper %}
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">대쉬보드</h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-lg-12">
+            {% if files %}
+            <!-- /.panel -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-bar-chart-o fa-fw"></i> 동영상 다운로드
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>이름</th>
+                                    <th>크기</th>
+                                    <th>배율</th>
+                                    <th>진행상황</th>
+                                    <th>삭제</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for file in files %}
+                                <tr>
+                                    <td>
+                                        {% if file.progress_status == "FI"%}
+                                        <a href="{% url 'dashboard:download_file' pk=file.pk %}" download>{{ file.uploaded_filename }}</a>
+                                        {% else %}
+                                        {{ file.uploaded_filename }}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ file.uploaded_file_size|filesizeformat }}</td>
+                                    <td>{{ file.scale_factor }}</td>
+                                    <td>{{ file.get_progress_status_display }}</td>
+                                    <td>
+                                        {% if file.progress_status == "FI"%}
+                                        <a href="{% url 'dashboard:delete_file' pk=file.pk %}">
+                                            <i class="fa fa-trash-o fa-fw text-danger"></i>
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+            
+            {% else %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-tasks fa-fw"></i> 동영상 업로드
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="form-group">
+                        {% csrf_token %}
+                        <div>
+                            <label>파일 이름: </label><label id="filename"></label>
+                        </div>
+                        <div class="radio">
+                            <label>확대 배율: </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="scale_factor" value="2" checked="checked">x2
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="scale_factor" value="4" disabled>x4
+                            </label>
+                        </div>
+                        <span class="btn btn-success fileinput-button">
+                            <i class="glyphicon glyphicon-plus"></i>
+                            <span>파일 추가</span>
+                            <input id="fileupload" type="file" name="uploaded_file" data-url="/upload/progress/" accept="video/*">
+                        </span>
+                        <button id="start_upload" type="button" class="btn btn-primary">
+                            <span>업로드 시작</span>
+                        </button>
+                        <div class="progress">
+                            <div id="progress" class="progress-bar"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+            {% endif %}
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+{% endblock %}
+{% block script %}
+    <script src="{% static 'dashboard/jquery-fileupload/js/vendor/jquery.ui.widget.js' %}"></script>
+    <script src="{% static 'dashboard/jquery-fileupload/js/jquery.iframe-transport.js' %}"></script>
+    <script src="{% static 'dashboard/jquery-fileupload/js/jquery.fileupload.js' %}"></script>
+    <script src="{% static 'dashboard/js/chunk-size-upload.js' %}"></script>
+{% endblock %}

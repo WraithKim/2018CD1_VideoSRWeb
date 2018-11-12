@@ -1,0 +1,43 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}
+사용자 설정 - 화질구지
+{% endblock %}
+
+{% block style %}
+{% endblock %}
+
+{% block page-wrapper %}
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">사용자 설정</h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-lg-12">
+            <!-- /.panel -->
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    계정 탈퇴
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <p>화질구지 서비스를 탈퇴하시겠습니까?</p>
+                    <p class="text-danger">지금까지 충전한 크레딧이 전부 사라집니다.</p>
+                    <a class="btn btn-danger" href="{% url 'dashboard:delete_account' %}">
+                        <i class="fa fa-ban"></i> 계정 탈퇴
+                    </a>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+{% endblock %}
+{% block script %}
+{% endblock %}

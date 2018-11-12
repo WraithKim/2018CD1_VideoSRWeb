@@ -1,6 +1,3 @@
-[submodule "videosr/static/videosr/json-js"]
-	path = videosr/static/videosr/json-js
-	url = https://github.com/douglascrockford/JSON-js.git
-[submodule "videosr/static/videosr/jquery-fileupload"]
-	path = videosr/static/videosr/jquery-fileupload
+[submodule "dashboard/static/dashboard/jquery-fileupload"]
+	path = dashboard/static/dashboard/jquery-fileupload
 	url = https://github.com/blueimp/jQuery-File-Upload.git
