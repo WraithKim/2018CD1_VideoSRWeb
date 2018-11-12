@@ -5,18 +5,16 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.db import DatabaseError, transaction
-
-from social_django.models import UserSocialAuth
 from .models import Customer
-import logging
-import random, json, requests, datetime
+import logging, random, json, requests, datetime
 
 logger = logging.getLogger(__name__)
 
 @login_required
 def index(request):
     return render(request, 'payment/index.html')
-
+    
+@login_required
 def payment_request(request, amount):
     url = "https://pay.toss.im/api/v1/payments"
     params = {
@@ -45,14 +43,17 @@ def payment_success(request, amount):
     try:
         with transaction.atomic():
             # TODO: User에서 Customer를 불러올 수 있나?(user.customer)
-            curCustomer = Customer.objects.get(user=request.user)
+            # curCustomer = Customer.objects.get(user=request.user)
+            curCustomer = request.user.customer
+            # TODO: 상한선 설정
             curCustomer.credit += int(amount)
             curCustomer.save()
     except DatabaseError as e:
         logger.error(e)
         return redirect('test:payment_fail')
     else:
-        return render(request, 'videosr/payment_success.html', {'credit' : curCustomer.credit})
+        return render(request, 'payment/payment_success.html', {'credit' : curCustomer.credit})
 
+@login_required
 def payment_fail(request):
-    return render(request, 'videosr/payment_fail.html')
+    return render(request, 'payment/payment_fail.html')
