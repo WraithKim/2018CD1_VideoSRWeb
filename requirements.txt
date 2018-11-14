@@ -22,3 +22,11 @@ social-auth-core==1.7.0
 urllib3==1.23
 uWSGI==2.0.17.1
 vine==1.1.4
+torch
+torchvision
+opencv-python
+pillow
+numpy
+easydict
+tqdm
+scikit-image
