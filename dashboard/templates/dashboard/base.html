@@ -85,6 +85,9 @@
                         <li>
                             <a href="{% url 'dashboard:user_settings' %}" {% if activate == 'settings' %} class="active" {% endif %}><i class="fa fa-wrench fa-fw"></i> 사용자 설정</a>
                         </li>
+                        <li>
+                            <a href="{% url 'payment:index' %}" {% if activate == 'payment' %} class="active" {% endif %}><i class="fa fa-credit-card fa-fw"></i> 결제 관리</a>
+                        </li>
                     </ul>
                 </div>
                 <!-- /.sidebar-collapse -->
