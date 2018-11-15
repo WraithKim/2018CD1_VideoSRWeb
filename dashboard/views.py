@@ -6,22 +6,23 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.db import DatabaseError, transaction
+from django.db.models import F
 
 from social_django.models import UserSocialAuth
 from payment.models import Customer
 from .models import UploadedFile
 from .utils import upload_file, is_valid_file_request
 import urllib.parse, logging, os, pika
+from pika.exceptions import AMQPError
 
 logger = logging.getLogger(__name__)
 
 @login_required
 def index(request):
-    customer = Customer.objects.get(user=request.user)
     uploaded_files = UploadedFile.objects.filter(owner=request.user)
     return render(request, 'dashboard/index.html', {
         'activate': "dashboard",
-        'credit': customer.credit,
+        'credit': request.user.customer.credit,
         'files': uploaded_files
     })
 
@@ -40,21 +41,19 @@ def upload_complete(request):
     # Filename is encoded to url when jQuery-File-Upload send the file.
     filename = urllib.parse.unquote(request.POST.get('uploaded_file.name'))
     version = request.POST.get('uploaded_file.md5')
-    # FIXME: 테스트용으로 scale_factor를 2배로만 설정함.
-    scale_factor = 2
-    #scale_factor = int(request.POST.get('scale_factor'))
-    
+    scale_factor = int(request.POST.get('scale_factor'))
+    product_price = (size * scale_factor / 1000)
+    # 크레딧 감소, 파일 업로드, 업로드된 동영상을 SR모듈에 전달하는 작업 중 하나라도 실패할 시,
+    # rollback을 해야 함.
     try:
         with transaction.atomic():
-            customer = Customer.objects.get(user=request.user)
-            product_price = (size * scale_factor / 1000)
-            if customer.credit < product_price:
+            # 크레딧이 부족하면 업로드를 거부함.
+            if request.user.customer.credit < product_price:
                 return HttpResponse("크레딧이 부족합니다.", status=400)
+            # 만약 이미 업로드 된 파일이 존재하면 업로드를 거부함
             if UploadedFile.objects.filter(owner__pk=request.user.pk).exists():
-                # alreay file uploaded. reject.
                 return HttpResponse("모든 사용자는 파일 하나만 업로드 가능합니다.", status=400)
-            customer.credit -= product_price 
-            customer.save()
+            
             # create new UploadedFile
             new_file = upload_file(owner=request.user,
                         name=filename,
@@ -62,14 +61,12 @@ def upload_complete(request):
                         version=version,
                         path=path,
                         size=size)
-    except DatabaseError as de:
-        logger.error(de)
-        return HttpResponse(status=500)
-    else:
-        if new_file is not None:
+            # 만약 업로드된 파일을 찾을 수 없을 때는 서버 에러를 반환
+            if new_file is None:
+                return HttpResponse(status=500)
+                
             new_file_path = settings.MEDIA_ROOT + new_file.uploaded_file.name
             # enqueue this file in message queue
-            # FIXME: 큐 전송 부분에도 예외처리는 필요함.
             message_body = "{} {} {} {}".format(
                 new_file.pk,
                 new_file_path,
@@ -88,6 +85,14 @@ def upload_complete(request):
                             ))
             logger.debug("Send MQ: '{}'".format(message_body))
             connection.close()
+        
+            Customer.objects.filter(user=request.user).update(credit = F('credit') - product_price)
+    
+    # 데이터베이스 트랜잭션 에러 또는 pika의 AMQP 에러가 발생시 서버 에러를 반환
+    except (DatabaseError, AMQPError) as e:
+        logger.error(e)
+        return HttpResponse(status=500)
+    else:
         return HttpResponse(status=200)
 
 @login_required
@@ -110,12 +115,13 @@ def delete_file(request, pk):
     file_to_delete.delete()
     return redirect('dashboard:index')
 
-### dashboard:index end ###
+### functions in menu "dashboard" end ###
 
 @login_required
 def user_settings(request):
     return render(request, 'dashboard/settings.html', {
-        'activate': "settings"
+        'activate': "settings",
+        'credit': request.user.customer.credit
     })
 
 @login_required
@@ -126,9 +132,10 @@ def delete_account(request):
             # (확인하고 싶으면 관리자 페이지에서 삭제해보셈...)
             UserSocialAuth.objects.filter(user=request.user).delete()
             User.objects.filter(pk=request.user.pk).delete()
-            return redirect('login:index')
     except DatabaseError as de:
         logger.error(de)
         return HttpResponse(status=400)
+    else:
+        return redirect('login:index')
 
-### dashboard:user_settings end ###
+### functions in menu "settings" end ###

@@ -56,7 +56,7 @@ def is_valid_file_request(request_post):
     try:
         path = request_post.get('uploaded_file.path')
         size = request_post.get('uploaded_file.size')
-        filename = request_post.get('uploaded_file.name')      
+        filename = request_post.get('uploaded_file.name')
         version = request_post.get('uploaded_file.md5')
         scale_factor = request_post.get('scale_factor')
 
@@ -75,9 +75,7 @@ def is_valid_file_request(request_post):
         #if int(video_resolution[0]) > 858 or int(video_resolution[1]) > 480:
             #logger.error("The resolution of file {} is too large. ({}, {})".format(path, video_resolution[0], video_resolution[1]))
             #return False
-    except KeyError:
-        return False
-    except subprocess.CalledProcessError as e:
+    except (KeyError, subprocess.CalledProcessError) as e:
         logger.error(e)
         return False
     else:

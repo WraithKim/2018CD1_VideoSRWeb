@@ -4,19 +4,12 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:400,100,100italic,300,300italic,400italic,700italic,700,900italic,900);
 @import url(https://fonts.googleapis.com/css?family=Raleway:400,100,200,300,500,600,700,800,900);
 @import url(https://fonts.googleapis.com/css?family=Raleway:400,100,200,300,500,600,700,800,900);
-body{background-color:#eee;}
-
-#generic_price_table{
-	background-color: #f0eded;
-}
+body{background-color:#fff;}
 
 /*PRICE COLOR CODE START*/
-#generic_price_table .generic_content{
-	background-color: #fff;
-}
 
 #generic_price_table .generic_content .generic_head_price{
-	background-color: #f6f6f6;
+	background-color: #fff;
 }
 
 #generic_price_table .generic_content .generic_head_price .generic_head_content .head_bg{
@@ -51,7 +44,7 @@ body{background-color:#eee;}
 	color: #414141;
 }
 #generic_price_table .generic_content .generic_feature_list ul li:hover{
-	background-color: #E4E4E4;
+	background-color: #fff;
 	border-left: 5px solid #2ECC71;
 }
 
