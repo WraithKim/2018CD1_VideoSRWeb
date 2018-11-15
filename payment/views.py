@@ -62,7 +62,7 @@ def payment_success(request, amount):
             
         # DB에 amount에 해당하는 값 만큼 update
         try:
-            Customer.objects.filter(user=request.user).update(credit = F('credit') - int(amount))
+            Customer.objects.filter(user=request.user).update(credit = F('credit') + int(amount))
             pay_complete(payToken,orderNo,amount)
         except DatabaseError as de:
             logger.error(de)
@@ -75,6 +75,7 @@ def payment_success(request, amount):
 
 @login_required
 def payment_fail(request):
+    logger.debug("render fail")
     return render(request, 'payment/payment_fail.html', {
         "activate": "payment",
         "credit": request.user.customer.credit
@@ -88,9 +89,9 @@ def payment_check(token):
         "apiKey": "sk_test_apikey1234567890",
     }
     r = requests.post(url, data=params)
-    dict = json.loads(r.text)
-    if dict['code'] == 0:
-        return dict['payStatus']
+    d = json.loads(r.text)
+    if d['code'] == 0:
+        return d['payStatus']
     else:
         return None
 

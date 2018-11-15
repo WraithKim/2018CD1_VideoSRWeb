@@ -151,6 +151,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Fix redirection loop
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
