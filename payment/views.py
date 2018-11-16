@@ -1,13 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
-from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.db import DatabaseError, transaction
 from django.db.models import F
 from .models import Customer, Order
-import logging, random, json, requests, datetime, uuid
+import logging, json, requests, datetime, uuid
 
 logger = logging.getLogger(__name__)
 
@@ -75,11 +73,11 @@ def payment_success(request, amount):
 
 @login_required
 def payment_fail(request):
-    logger.debug("render fail")
     return render(request, 'payment/payment_fail.html', {
         "activate": "payment",
         "credit": request.user.customer.credit
     })
+    
 ##### request-handling function end #######
 ###### non-request-handling function ######
 def payment_check(token):
