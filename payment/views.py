@@ -10,6 +10,8 @@ import logging, json, requests, datetime, uuid
 
 logger = logging.getLogger(__name__)
 
+tossapi_url = "https://pay.toss.im/api/v1/"
+
 ##### request handling function #######
 @login_required
 def index(request):
@@ -22,7 +24,7 @@ def index(request):
 
 @login_required
 def payment_request(request, amount):
-    url = "https://pay.toss.im/api/v1/payments"
+    url = tossapi_url + "payments"
     orderNo = str(uuid.uuid4())
     amount = str(amount)
     params = {
@@ -79,7 +81,7 @@ def payment_fail(request):
 ##### request-handling function end #######
 ###### non-request-handling function ######
 def payment_check(token):
-    url = "https://pay.toss.im/api/v1/status"
+    url = tossapi_url + "status"
     params = {
         "payToken": token,
         "apiKey": "sk_test_apikey1234567890",
@@ -92,7 +94,7 @@ def payment_check(token):
         return None
 
 def pay_complete(payToken,orderNo,amount):
-    url = "https://pay.toss.im/api/v1/execute"
+    url = tossapi_url + "execute"
     params = {
         "payToken": payToken,
         "orderNo" : orderNo,
