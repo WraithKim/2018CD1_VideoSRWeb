@@ -2,18 +2,21 @@
 
 import sys, pika, psycopg2
 import json, logging, logging.config, time
-# from inf_prosr import Infmodule_proSR
+from pika.exceptions import AMQPError
+from inf_prosr import Infmodule_proSR
 
+########## adapter settings #############
 PROJECT_DIR = "/home/wraithkim/videoSRWeb/"
 
-# logger config
-with open(PROJECT_DIR + 'videosr/videoSR-inference/logging.json', 'r') as f:
+##### logger config
+with open(PROJECT_DIR + 'videoSR-inference/logging.json', 'r') as f:
     logConfig = json.load(f)
 
 logging.config.dictConfig(logConfig)
 
 logger = logging.getLogger("sr_adapter")
 
+##### uncaught exception handling
 # 이 프로그램에서 발생한 처리되지 않은 예외를 로그로 기록함.
 def handle_exception(exc_type, exc_value, exc_traceback):
     if issubclass(exc_type, KeyboardInterrupt):
@@ -24,7 +27,7 @@ def handle_exception(exc_type, exc_value, exc_traceback):
 
 sys.excepthook = handle_exception
 
-# db config
+##### DB config
 with open(PROJECT_DIR + 'config.json', 'r') as f:
     dbConfig = json.load(f)
 
@@ -34,6 +37,7 @@ conn_string = "host='{hostname}' dbname='{dbname}' user='{username}' password='{
             username=dbConfig['DATABASE']['USER'],
             password=dbConfig['DATABASE']['PASSWORD']
         )
+############ adapter settings end ##################
 
 class SRDefaultWebAdapter:
     """SR모듈을 웹서버와 연결하기 위한 어댑터 클래스
@@ -44,21 +48,24 @@ class SRDefaultWebAdapter:
         self.srm_scale4 = srm_scale4
 
     def _run_mq(self):
-        connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
-        channel = connection.channel()
-
-        # 어느 큐에 연결할지 선언함
-        # 만약 선언한 큐가 존재하지 않으면 rabbitMQ에 자동으로 생성함.
-        channel.queue_declare(queue='sr_queue', durable=True)
-        # 이미 메세지를 처리 중인 worker에게는 메세지를 전달하지 않음(공평한 작업 분배)
-        channel.basic_qos(prefetch_count=1)
-        channel.basic_consume(self._callback_mq, queue='sr_queue')
-
-        logger.debug("Waiting for request.")
         try:
+            connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+            channel = connection.channel()
+    
+            # 어느 큐에 연결할지 선언함
+            # 만약 선언한 큐가 존재하지 않으면 rabbitMQ에 자동으로 생성함.
+            channel.queue_declare(queue='sr_queue', durable=True)
+            # 이미 메세지를 처리 중인 worker에게는 메세지를 전달하지 않음(공평한 작업 분배)
+            channel.basic_qos(prefetch_count=1)
+            channel.basic_consume(self._callback_mq, queue='sr_queue')
+    
+            logger.debug("Waiting for request.")
             channel.start_consuming()
         except KeyboardInterrupt:
             # Gracefully close the connection
+            connection.close()
+        except AMQPError as e:
+            logger.error(e)
             connection.close()
 
     def _callback_mq(self, ch, method, properties, body):
@@ -73,15 +80,15 @@ class SRDefaultWebAdapter:
         file_id = int(file_info_list[0])
         scale_factor = int(file_info_list[3])
 
-        time.sleep(10) # FIXME: Test용 코드
+        # time.sleep(10) # FIXME: Test용 코드
         self._update_state(file_id, "IP")
         if scale_factor == 2:
             logger.info("SR x2 start file: {}".format(file_id))
-            # self.srm_scale2.sr_video_nosr(file_info_list[1], file_info_list[2])
+            self.srm_scale2.sr_video_nosr(file_info_list[1], file_info_list[2])
         if scale_factor == 4:
             logger.info("SR x4 start file: {}".format(file_id))
-            # self.srm_scale4.sr_video_nosr(file_info_list[1], file_info_list[2])
-        time.sleep(30) # FIXME: Test용 코드
+            self.srm_scale4.sr_video_nosr(file_info_list[1], file_info_list[2])
+        # time.sleep(30) # FIXME: Test용 코드
 
         self._update_state(file_id, "FI")
         logger.info("file id {} Done".format(file_id))
@@ -98,7 +105,7 @@ class SRDefaultWebAdapter:
         conn = None
         updated_rows = 0
 
-        try: 
+        try:
             conn = psycopg2.connect(conn_string)
             # create a new cursor
             cur = conn.cursor()
@@ -130,13 +137,13 @@ class SRDefaultWebAdapter:
 
 
 def main():
-    # srm_scale2 = Infmodule_proSR(model_path=PROJECT_DIR+"model/proSR/proSR_x2.pth", is_CUDA=False)
-    # srm_scale4 = Infmodule_proSR(model_path=PROJECT_DIR+"model/proSR/proSR_x4.pth", is_CUDA=False)
-    srm_scale2 = None
-    srm_scale4 = None
+    srm_scale2 = Infmodule_proSR(model_path=PROJECT_DIR+"model/proSR/proSR_x2.pth", is_CUDA=False)
+    srm_scale4 = Infmodule_proSR(model_path=PROJECT_DIR+"model/proSR/proSR_x4.pth", is_CUDA=False)
+    # srm_scale2 = None #FIXME: test용 코드
+    # srm_scale4 = None #FIXME: test용 코드
     adapter = SRDefaultWebAdapter(srm_scale2, srm_scale4)
     logger.info("SR Module on")
-    adapter.run_module(is_test=True)
+    adapter.run_module()
 
 if __name__ == "__main__":
     main()
