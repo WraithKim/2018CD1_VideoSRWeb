@@ -95,23 +95,21 @@ $(function () {
     },
 
     done: function (e, data) {
-      // if you want to see status code, use "var status = data.jqXHR.status;"
-      // FIXME: 디버그 정보가 노출됨
-      // var responseText = data.jqXHR.responseText || "업로드 완료";
-      // setProgressBarSuccess(responseText);
       location.reload();
     },
 
     fail: function (e, data) {
-      // if you want to see status code, use "var status = data.jqXHR.status;"
-      // FIXME: 디버그 정보가 노출됨
-      // var responseText = data.jqXHR.responseText || "업로드 오류";
       var responseText = "업로드 오류";
       setProgressBarFailed(responseText);
     },
 
     progress: function (e, data) {
-      setProgressBar(calculateProgress(data));
+      progress = calculateProgress(data);
+      if(progress == 100){
+        $('#progress').text("동영상 저장 중");
+      } else {
+        setProgressBar(progress);
+      }
     }
   });
 });
