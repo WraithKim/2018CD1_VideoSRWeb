@@ -61,7 +61,7 @@
                         <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-message">
-                        <li><a href="#"><i class="fa fa-money fa-fw"></i> 크레딧: {{ credit }}</a>
+                        <li><a href="#"><i class="fa fa-money fa-fw"></i> 크레딧: <span id="credit">{{ credit }}</span></a>
                         </li>
                         <li class="divider"></li>
                         <li><a href="{% url 'payment:index' %}"><i class="fa fa-credit-card fa-fw"></i> 결제</a>
