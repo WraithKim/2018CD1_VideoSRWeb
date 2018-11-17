@@ -48,28 +48,23 @@ def payment_success(request, amount):
 
     # orderNo로 payToken가져와서 check
     orderNo = request.GET['orderNo']
+    payToken = get_object_or_404(Order, orderNo=orderNo).payToken
+    # 결제를 제대로 시도하지 않았을 때
+    if "PAY_APPROVED" != payment_check(payToken):
+        return redirect('payment:payment_fail')
+        
+    # DB에 amount에 해당하는 값 만큼 update
     try:
-        payToken = Order.objects.get(orderNo=orderNo).payToken
-    except Order.DoesNotExist as dne:
-        logger.error(dne)
+        Customer.objects.filter(user=request.user).update(credit = F('credit') + int(amount))
+        pay_complete(payToken,orderNo,amount)
+    except DatabaseError as de:
+        logger.error(de)
         return redirect('payment:payment_fail')
     else:
-        # 결제를 제대로 시도하지 않았을 때
-        if "PAY_APPROVED" != payment_check(payToken):
-            return redirect('payment:payment_fail')
-            
-        # DB에 amount에 해당하는 값 만큼 update
-        try:
-            Customer.objects.filter(user=request.user).update(credit = F('credit') + int(amount))
-            pay_complete(payToken,orderNo,amount)
-        except DatabaseError as de:
-            logger.error(de)
-            return redirect('payment:payment_fail')
-        else:
-            return render(request, 'payment/payment_success.html', {
-                "activate": "payment",
-                "credit": request.user.customer.credit
-            })
+        return render(request, 'payment/payment_success.html', {
+            "activate": "payment",
+            "credit": request.user.customer.credit
+        })
 
 @login_required
 def payment_fail(request):
