@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.db import DatabaseError, transaction
 from django.db.models import F
@@ -23,6 +24,7 @@ def index(request):
 def payment_request(request, amount):
     url = "https://pay.toss.im/api/v1/payments"
     orderNo = str(uuid.uuid4())
+    amount = str(amount)
     params = {
         "orderNo": orderNo,
         "amount": amount,
@@ -30,7 +32,8 @@ def payment_request(request, amount):
         "productDesc":"테스트 결제",
         "apiKey": "sk_test_apikey1234567890",
         "resultCallback": "https://myshop.com/toss/result.php",
-        "retUrl": "https://videosr.koreacentral.cloudapp.azure.com/payment/"+ amount + "/success/",
+        "retUrl": "https://videosr.koreacentral.cloudapp.azure.com"
+        + reverse('payment:payment_success', kwargs={'amount': amount}),
         "cashRecipt": False
     }
 
