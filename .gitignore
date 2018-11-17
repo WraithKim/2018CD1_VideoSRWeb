@@ -373,7 +373,7 @@ $RECYCLE.BIN/
 env.py
 config.json
 # ignore media and static directory belongs to web server
-media/
+/media/
 /static/
 # log directory of this project
-log/
+/log/

@@ -12,216 +12,176 @@
 {% block page-wrapper %}
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">결제 관리</h1>
+            <h1 class="page-header">크레딧 충전</h1>
         </div>
         <!-- /.col-lg-12 -->
     </div>
     <div id="generic_price_table">
-        <section>
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-12">
-                        <!--PRICE HEADING START-->
-                        <div class="price-heading clearfix">
-                            <h1>가격표</h1>
+        <!--BLOCK ROW START-->
+        <div class="row">
+            <div class="col-lg-4">
+                <!--PANEL START-->
+                <div class="panel panel-default">
+                    <!--PRICE CONTENT START-->
+                    <div class="generic_content clearfix">
+        
+                        <!--HEAD PRICE DETAIL START-->
+                        <div class="generic_head_price clearfix">
+        
+                            <!--HEAD CONTENT START-->
+                            <div class="generic_head_content clearfix">
+        
+                            <!--HEAD START-->
+                                <div class="head_bg"></div>
+                                <div class="head">
+                                    <span>Basic</span>
+                                </div>
+                                <!--//HEAD END-->
+        
+                            </div>
+                            <!--//HEAD CONTENT END-->
+        
+                            <!--PRICE START-->
+                            <div class="generic_price_tag clearfix">
+                                <span class="price">
+                                    <span class="currency">9</span>
+                                    <span class="cent">,900   </span>
+                                    <span class="sign">won</span>
+                                </span>
+                            </div>
+                            <!--//PRICE END-->
+        
                         </div>
-                        <!--//PRICE HEADING END-->
+                        <!--//HEAD PRICE DETAIL END-->
+        
+                        <!--FEATURE LIST START-->
+                        <div class="generic_feature_list">
+                        </div>
+                        <!--//FEATURE LIST END-->
+        
+                        <!--BUTTON START-->
+                        <div class="generic_price_btn clearfix">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'payment:payment_request' amount='9900' %}">Pay</a>
+                        {% else %}
+                        <a href="{% url 'login:index' %}">Sign in</a>
+                        {% endif %}
+                        </div>
+                        <!--//BUTTON END-->
+        
                     </div>
+                    <!--//PRICE CONTENT END-->
                 </div>
+                <!--PANEL END-->
             </div>
-            <div class="container">
-    
-                <!--BLOCK ROW START-->
-                <div class="row">
-                    <div class="col-md-4">
-    
+            <div class="col-lg-4">
+                <!--PANEL START-->
+                <div class="panel panel-default">
                     <!--PRICE CONTENT START-->
-                        <div class="generic_content clearfix">
-    
-                            <!--HEAD PRICE DETAIL START-->
-                            <div class="generic_head_price clearfix">
-    
-                                <!--HEAD CONTENT START-->
-                                <div class="generic_head_content clearfix">
-    
-                                <!--HEAD START-->
-                                    <div class="head_bg"></div>
-                                    <div class="head">
-                                        <span>Basic</span>
-                                    </div>
-                                    <!--//HEAD END-->
-    
+                    <div class="generic_content active clearfix">
+                        <!--HEAD PRICE DETAIL START-->
+                        <div class="generic_head_price clearfix">
+                            <!--HEAD CONTENT START-->
+                            <div class="generic_head_content clearfix">
+                            <!--HEAD START-->
+                                <div class="head_bg"></div>
+                                <div class="head">
+                                    <span>Standard</span>
                                 </div>
-                                <!--//HEAD CONTENT END-->
-    
-                                <!--PRICE START-->
-                                <div class="generic_price_tag clearfix">
-                                    <span class="price">
-                                        <span class="sign">$</span>
-                                        <span class="currency">9</span>
-                                        <span class="cent">.99</span>
-                                        <span class="month">/100 coin</span>
-                                    </span>
-                                </div>
-                                <!--//PRICE END-->
-    
+                                <!--//HEAD END-->
                             </div>
-                            <!--//HEAD PRICE DETAIL END-->
-    
-                            <!--FEATURE LIST START-->
-                            <div class="generic_feature_list">
-                            <ul>
-                                <li><span>2GB</span> Bandwidth</li>
-                                    <li><span>150GB</span> Storage</li>
-                                    <li><span>12</span> Accounts</li>
-                                    <li><span>7</span> Host Domain</li>
-                                    <li><span>24/7</span> Support</li>
-                                </ul>
+                            <!--//HEAD CONTENT END-->
+        
+                            <!--PRICE START-->
+                            <div class="generic_price_tag clearfix">
+                                <span class="price">
+                                    <span class="currency">19</span>
+                                    <span class="cent">,900   </span>
+                                    <span class="sign">won</span>
+                                </span>
                             </div>
-                            <!--//FEATURE LIST END-->
-    
-                            <!--BUTTON START-->
-                            <div class="generic_price_btn clearfix">
-                            {% if user.is_authenticated %}
-                                <a href="{% url 'payment:payment_request' amount='9900' %}">Pay</a>
-                            {% else %}
-                            <a href="{% url 'login:index' %}">Sign in</a>
-                            {% endif %}
-                            </div>
-                            <!--//BUTTON END-->
-    
+                            <!--//PRICE END-->
                         </div>
-                        <!--//PRICE CONTENT END-->
-    
-                    </div>
-    
-                    <div class="col-md-4">
-    
-                    <!--PRICE CONTENT START-->
-                        <div class="generic_content active clearfix">
-    
-                            <!--HEAD PRICE DETAIL START-->
-                            <div class="generic_head_price clearfix">
-    
-                                <!--HEAD CONTENT START-->
-                                <div class="generic_head_content clearfix">
-    
-                                <!--HEAD START-->
-                                    <div class="head_bg"></div>
-                                    <div class="head">
-                                        <span>Standard</span>
-                                    </div>
-                                    <!--//HEAD END-->
-    
-                                </div>
-                                <!--//HEAD CONTENT END-->
-    
-                                <!--PRICE START-->
-                                <div class="generic_price_tag clearfix">
-                                    <span class="price">
-                                        <span class="sign">$</span>
-                                        <span class="currency">19</span>
-                                        <span class="cent">.99</span>
-                                        <span class="month">/250 coin</span>
-                                    </span>
-                                </div>
-                                <!--//PRICE END-->
-    
-                            </div>
-                            <!--//HEAD PRICE DETAIL END-->
-    
-                            <!--FEATURE LIST START-->
-                            <div class="generic_feature_list">
-                            <ul>
-                                <li><span>2GB</span> Bandwidth</li>
-                                    <li><span>150GB</span> Storage</li>
-                                    <li><span>12</span> Accounts</li>
-                                    <li><span>7</span> Host Domain</li>
-                                    <li><span>24/7</span> Support</li>
-                                </ul>
-                            </div>
-                            <!--//FEATURE LIST END-->
-    
-                            <!--BUTTON START-->
-                            <div class="generic_price_btn clearfix">
-                            {% if user.is_authenticated %}
-                            <a href="{% url 'payment:payment_request' amount='19900' %}">pay</a>
-                            {% else %}
-                            <a href="{% url 'login:index' %}">Sign in</a>
-                            {% endif %}
-                            </div>
-                            <!--//BUTTON END-->
-    
+                        <!--//HEAD PRICE DETAIL END-->
+        
+                        <!--FEATURE LIST START-->
+                        <div class="generic_feature_list">
                         </div>
-                        <!--//PRICE CONTENT END-->
-    
-                    </div>
-                    <div class="col-md-4">
-    
-                    <!--PRICE CONTENT START-->
-                        <div class="generic_content clearfix">
-    
-                            <!--HEAD PRICE DETAIL START-->
-                            <div class="generic_head_price clearfix">
-    
-                                <!--HEAD CONTENT START-->
-                                <div class="generic_head_content clearfix">
-    
-                                <!--HEAD START-->
-                                    <div class="head_bg"></div>
-                                    <div class="head">
-                                        <span>Unlimited</span>
-                                    </div>
-                                    <!--//HEAD END-->
-    
-                                </div>
-                                <!--//HEAD CONTENT END-->
-    
-                                <!--PRICE START-->
-                                <div class="generic_price_tag clearfix">
-                                    <span class="price">
-                                        <span class="sign">$</span>
-                                        <span class="currency">49</span>
-                                        <span class="cent">.99</span>
-                                        <span class="month">/</span>
-                                    </span>
-                                </div>
-                                <!--//PRICE END-->
-    
-                            </div>
-                            <!--//HEAD PRICE DETAIL END-->
-    
-                            <!--FEATURE LIST START-->
-                            <div class="generic_feature_list">
-                            <ul>
-                                <li><span>2GB</span> Bandwidth</li>
-                                    <li><span>150GB</span> Storage</li>
-                                    <li><span>12</span> Accounts</li>
-                                    <li><span>7</span> Host Domain</li>
-                                    <li><span>24/7</span> Support</li>
-                                </ul>
-                            </div>
-                            <!--//FEATURE LIST END-->
-    
-                            <!--BUTTON START-->
-                            <div class="generic_price_btn clearfix">
-                            {% if user.is_authenticated %}
-                                <a href="{% url 'payment:payment_request' amount='49900' %}">Pay</a>
-                            {% else %}
-                                <a href="{% url 'login:index' %}">Sign in</a>
-                            {% endif %}
-                            </div>
-                            <!--//BUTTON END-->
-    
+                        <!--//FEATURE LIST END-->
+        
+                        <!--BUTTON START-->
+                        <div class="generic_price_btn clearfix">
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'payment:payment_request' amount='19900' %}">pay</a>
+                        {% else %}
+                        <a href="{% url 'login:index' %}">Sign in</a>
+                        {% endif %}
                         </div>
-                        <!--//PRICE CONTENT END-->
-    
+                        <!--//BUTTON END-->
+        
                     </div>
+                    <!--//PRICE CONTENT END-->
                 </div>
-                <!--//BLOCK ROW END-->
-    
+                <!--PANEL END-->
             </div>
-        </section>
+            <div class="col-lg-4">
+                <!--PANEL START-->
+                <div class="panel panel-default">
+                    <!--PRICE CONTENT START-->
+                    <div class="generic_content clearfix">
+        
+                        <!--HEAD PRICE DETAIL START-->
+                        <div class="generic_head_price clearfix">
+        
+                            <!--HEAD CONTENT START-->
+                            <div class="generic_head_content clearfix">
+        
+                            <!--HEAD START-->
+                                <div class="head_bg"></div>
+                                <div class="head">
+                                    <span>Unlimited</span>
+                                </div>
+                                <!--//HEAD END-->
+        
+                            </div>
+                            <!--//HEAD CONTENT END-->
+        
+                            <!--PRICE START-->
+                            <div class="generic_price_tag clearfix">
+                                <span class="price">
+                                    <span class="currency">49</span>
+                                    <span class="cent">,900   </span>
+                                    <span class="sign">won</span>
+                                </span>
+                            </div>
+                            <!--//PRICE END-->
+        
+                        </div>
+                        <!--//HEAD PRICE DETAIL END-->
+        
+                        <!--FEATURE LIST START-->
+                        <div class="generic_feature_list">
+                        </div>
+                        <!--//FEATURE LIST END-->
+        
+                        <!--BUTTON START-->
+                        <div class="generic_price_btn clearfix">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'payment:payment_request' amount='49900' %}">Pay</a>
+                        {% else %}
+                            <a href="{% url 'login:index' %}">Sign in</a>
+                        {% endif %}
+                        </div>
+                        <!--//BUTTON END-->
+        
+                    </div>
+                    <!--//PRICE CONTENT END-->
+                </div>
+                <!--PANEL END-->
+            </div>
+        </div>
+        <!--//BLOCK ROW END-->
+    </div>
 {% endblock %}
 {% block script %}
 {% endblock %}

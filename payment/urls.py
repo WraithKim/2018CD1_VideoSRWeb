@@ -4,7 +4,7 @@ app_name = 'payment'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('<amount>/', views.payment_request, name='payment_request'),
-    path('<amount>/success/',views.payment_success, name='payment_success'),
+    path('request/<int:amount>/', views.payment_request, name='payment_request'),
+    path('success/<int:amount>/',views.payment_success, name='payment_success'),
     path('fail/',views.payment_fail, name='payment_fail'),
 ]
