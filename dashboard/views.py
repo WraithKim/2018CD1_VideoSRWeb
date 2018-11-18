@@ -42,6 +42,7 @@ def upload_complete(request):
     filename = urllib.parse.unquote(request.POST.get('uploaded_file.name'))
     version = request.POST.get('uploaded_file.md5')
     scale_factor = int(request.POST.get('scale_factor'))
+    # 동영상 SR처리 비용, 이 계산은 chunk-size-upload.js에도 영향을 미침
     product_price = (size * scale_factor / 1000)
     # 크레딧 감소, 파일 업로드, 업로드된 동영상을 SR모듈에 전달하는 작업 중 하나라도 실패할 시,
     # rollback을 해야 함.
@@ -99,12 +100,14 @@ def upload_complete(request):
 def download_file(request, pk):
     file_to_download = get_object_or_404(UploadedFile, pk=pk, owner=request.user)
     (dirname, basename) = os.path.split(file_to_download.uploaded_file.name)
-    basename = "sr_" + basename
-    if not os.path.exists(settings.MEDIA_ROOT+dirname + basename):
+    # basename = "sr_" + basename #FIXME: test code
+    sr_relative_path = os.path.join(dirname, basename)
+    if not os.path.isfile(settings.MEDIA_ROOT + sr_relative_path):
+        logger.warn("Download file - file not found. pk: {}".format(pk))
         return HttpResponse(status=404)
     response = HttpResponse()
     response['Content-Disposition'] = 'attachment; filename={0}'.format(urllib.parse.quote(file_to_download.uploaded_filename))
-    response['X-Accel-Redirect'] = '/media/{0}'.format(dirname + basename)
+    response['X-Accel-Redirect'] = '/media/{0}'.format(sr_relative_path)
     return response
 
 @login_required

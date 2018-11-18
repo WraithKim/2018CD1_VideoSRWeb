@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.db import DatabaseError, transaction
 from django.db.models import F
@@ -8,6 +9,8 @@ from .models import Customer, Order
 import logging, json, requests, datetime, uuid
 
 logger = logging.getLogger(__name__)
+
+tossapi_url = "https://pay.toss.im/api/v1/"
 
 ##### request handling function #######
 @login_required
@@ -21,8 +24,9 @@ def index(request):
 
 @login_required
 def payment_request(request, amount):
-    url = "https://pay.toss.im/api/v1/payments"
+    url = tossapi_url + "payments"
     orderNo = str(uuid.uuid4())
+    amount = str(amount)
     params = {
         "orderNo": orderNo,
         "amount": amount,
@@ -30,7 +34,8 @@ def payment_request(request, amount):
         "productDesc":"테스트 결제",
         "apiKey": "sk_test_apikey1234567890",
         "resultCallback": "https://myshop.com/toss/result.php",
-        "retUrl": "https://videosr.koreacentral.cloudapp.azure.com/payment/"+ amount + "/success/",
+        "retUrl": "https://videosr.koreacentral.cloudapp.azure.com"
+        + reverse('payment:payment_success', kwargs={'amount': amount}),
         "cashRecipt": False
     }
 
@@ -76,7 +81,7 @@ def payment_fail(request):
 ##### request-handling function end #######
 ###### non-request-handling function ######
 def payment_check(token):
-    url = "https://pay.toss.im/api/v1/status"
+    url = tossapi_url + "status"
     params = {
         "payToken": token,
         "apiKey": "sk_test_apikey1234567890",
@@ -89,7 +94,7 @@ def payment_check(token):
         return None
 
 def pay_complete(payToken,orderNo,amount):
-    url = "https://pay.toss.im/api/v1/execute"
+    url = tossapi_url + "execute"
     params = {
         "payToken": payToken,
         "orderNo" : orderNo,

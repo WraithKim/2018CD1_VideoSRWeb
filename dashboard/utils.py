@@ -69,12 +69,11 @@ def is_valid_file_request(request_post):
         if len(filename) > 255:
             return False
         # check video format
-        #FIXME: 테스트용으로 해상도제한을 해제함.(성능측정을 위해 subprocess는 남겨둠.)
         video_resolution = subprocess.check_output(
             ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=coded_width,coded_height", "-of", "csv=e=none:p=0", path], universal_newlines=True).split(",")
-        #if int(video_resolution[0]) > 858 or int(video_resolution[1]) > 480:
-            #logger.error("The resolution of file {} is too large. ({}, {})".format(path, video_resolution[0], video_resolution[1]))
-            #return False
+        if int(video_resolution[0]) > 858 or int(video_resolution[1]) > 480:
+            logger.error("The resolution of file {} is too large. ({}, {})".format(path, video_resolution[0], video_resolution[1]))
+            return False
     except (KeyError, subprocess.CalledProcessError) as e:
         logger.error(e)
         return False

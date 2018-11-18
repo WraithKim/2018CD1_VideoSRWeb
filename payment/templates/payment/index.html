@@ -34,7 +34,7 @@
                             <!--HEAD START-->
                                 <div class="head_bg"></div>
                                 <div class="head">
-                                    <span>Basic</span>
+                                    <span>베이직</span>
                                 </div>
                                 <!--//HEAD END-->
         
@@ -46,7 +46,7 @@
                                 <span class="price">
                                     <span class="currency">9</span>
                                     <span class="cent">,900   </span>
-                                    <span class="sign">won</span>
+                                    <span class="sign">원</span>
                                 </span>
                             </div>
                             <!--//PRICE END-->
@@ -61,11 +61,7 @@
         
                         <!--BUTTON START-->
                         <div class="generic_price_btn clearfix">
-                        {% if user.is_authenticated %}
-                            <a href="{% url 'payment:payment_request' amount='9900' %}">Pay</a>
-                        {% else %}
-                        <a href="{% url 'login:index' %}">Sign in</a>
-                        {% endif %}
+                            <a href="{% url 'payment:payment_request' amount='9900' %}">결제</a>
                         </div>
                         <!--//BUTTON END-->
         
@@ -86,7 +82,7 @@
                             <!--HEAD START-->
                                 <div class="head_bg"></div>
                                 <div class="head">
-                                    <span>Standard</span>
+                                    <span>스탠다드</span>
                                 </div>
                                 <!--//HEAD END-->
                             </div>
@@ -97,7 +93,7 @@
                                 <span class="price">
                                     <span class="currency">19</span>
                                     <span class="cent">,900   </span>
-                                    <span class="sign">won</span>
+                                    <span class="sign">원</span>
                                 </span>
                             </div>
                             <!--//PRICE END-->
@@ -111,11 +107,7 @@
         
                         <!--BUTTON START-->
                         <div class="generic_price_btn clearfix">
-                        {% if user.is_authenticated %}
-                        <a href="{% url 'payment:payment_request' amount='19900' %}">pay</a>
-                        {% else %}
-                        <a href="{% url 'login:index' %}">Sign in</a>
-                        {% endif %}
+                            <a href="{% url 'payment:payment_request' amount='9900' %}">결제</a>
                         </div>
                         <!--//BUTTON END-->
         
@@ -139,7 +131,7 @@
                             <!--HEAD START-->
                                 <div class="head_bg"></div>
                                 <div class="head">
-                                    <span>Unlimited</span>
+                                    <span>얼티메이트</span>
                                 </div>
                                 <!--//HEAD END-->
         
@@ -151,7 +143,7 @@
                                 <span class="price">
                                     <span class="currency">49</span>
                                     <span class="cent">,900   </span>
-                                    <span class="sign">won</span>
+                                    <span class="sign">원</span>
                                 </span>
                             </div>
                             <!--//PRICE END-->
@@ -166,11 +158,7 @@
         
                         <!--BUTTON START-->
                         <div class="generic_price_btn clearfix">
-                        {% if user.is_authenticated %}
-                            <a href="{% url 'payment:payment_request' amount='49900' %}">Pay</a>
-                        {% else %}
-                            <a href="{% url 'login:index' %}">Sign in</a>
-                        {% endif %}
+                            <a href="{% url 'payment:payment_request' amount='9900' %}">결제</a>
                         </div>
                         <!--//BUTTON END-->
         

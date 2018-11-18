@@ -16,12 +16,19 @@ $(function () {
     // acceptFileTypes follow 'accept' attribute in <input type="file"> form.
     acceptFileTypes = /^video\//i;
     if (data.files[0]['size'] > maxFileSize){
-      setProgressBarFailed("File size too large");
+      setProgressBarFailed("파일 크기가 너무 큽니다.");
       return false;
     }
     if (!acceptFileTypes.test(data.files[0]['type'])){
-      setProgressBarFailed("Not supported file type");
+      setProgressBarFailed("지원하지 않는 파일 형식입니다.");
       return false;
+    }
+    scale_factor = $("input[type='radio'][name='scale_factor']:checked").val();
+    credit = $("#credit").text();
+    // 이 동영상 처리 비용 계산은 dashboard/views.py의 upload_complete함수에도 영향을 미침
+    if ((scale_factor * data.files[0]['size'])/1000 > credit){
+        setProgressBarFailed("크레딧이 부족합니다.");
+        return false;
     }
     return true;
   }

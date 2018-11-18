@@ -11,6 +11,11 @@ def delete_uploaded_file(sender, instance, *args, **kwargs):
     """delete the file from filesystem
     """
     path = instance.uploaded_file.path
+    (dirname, basename) = os.path.split(path)
+    sr_path = os.path.join(dirname, "sr_" + basename)
+    if os.path.isfile(sr_path):
+        logger.info("Delete SR video - id: {} path: {}".format(instance.pk, sr_path))
+        os.remove(sr_path)
     if os.path.isfile(path):
-        logger.info("Delete file - id: {} path: {}".format(instance.pk, path))
+        logger.info("Delete Original video - id: {} path: {}".format(instance.pk, path))
         os.remove(path)
