@@ -1,3 +1,6 @@
 [submodule "dashboard/static/dashboard/jquery-fileupload"]
 	path = dashboard/static/dashboard/jquery-fileupload
 	url = https://github.com/blueimp/jQuery-File-Upload.git
+[submodule "staticfiles/sb-admin-2"]
+	path = staticfiles/sb-admin-2
+	url = https://github.com/BlackrockDigital/startbootstrap-sb-admin-2.git

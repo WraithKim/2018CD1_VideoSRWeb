@@ -35,7 +35,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['videosr.koreacentral.cloudapp.azure.com']
+ALLOWED_HOSTS = ['www.hwajilguji.online']
 
 
 # Application definition
@@ -143,7 +143,7 @@ LOGOUT_REDIRECT_URL='login:index'
 
 LANGUAGE_CODE = 'ko'
 
-TIME_ZONE = 'Asia/Seoul'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -173,7 +173,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media', '')
 
 # Logging
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -189,10 +188,19 @@ LOGGING = {
     },
 
     'handlers': {
-        'file': {
+        'debug': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(BASE_DIR, 'log','debug.log'),     
+            'formatter': 'verbose',
+            'maxBytes':1024*1024*10, 
+            'backupCount':5,
+        },
+
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, 'log','django.log'),     
             'formatter': 'verbose',
             'maxBytes':1024*1024*10, 
             'backupCount':5,
@@ -211,10 +219,22 @@ LOGGING = {
             'level':'INFO', 
         }, 
         
-        'videosr': { 
-            'handlers': ['file'], 
+        'login': { 
+            'handlers': ['debug'], 
+            'level': 'DEBUG', 
+        }, 
+
+        'dashboard': { 
+            'handlers': ['debug'], 
+            'level': 'DEBUG', 
+        }, 
+
+        'payment': { 
+            'handlers': ['debug'], 
             'level': 'DEBUG', 
         }, 
     }
 }
+
+
 
