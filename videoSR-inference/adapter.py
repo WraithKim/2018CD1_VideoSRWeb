@@ -138,8 +138,6 @@ class SRDefaultWebAdapter:
 def main():
     srm_scale2 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/proSR/proSR_x2.pth", is_CUDA=True)
     srm_scale4 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/proSR/proSR_x4.pth", is_CUDA=True)
-    #srm_scale2 = None #FIXME: test용 코드
-    #srm_scale4 = None #FIXME: test용 코드
     adapter = SRDefaultWebAdapter(srm_scale2, srm_scale4)
     logger.info("SR Module on")
     adapter.run_module()
