@@ -23,7 +23,7 @@ from prosr.utils import (get_filenames, IMG_EXTENSIONS, print_evaluation,
                          tensor2im)
 
 
-TMP_FOLDER = "./tmp"
+TMP_FOLDER = "/tmp"
 
 
 class Infmodule_proSR:
@@ -148,25 +148,25 @@ class Infmodule_proSR:
         fps = self._video_to_frame(lr_video_path)
         fn = ntpath.basename(lr_video_path)
         #blurImage.aug_all_folder("./tmp/" + fn + "/","./tmp/" + fn + "/",'edge_enhance')
-        self._inference_video("./tmp/" + fn , "./tmp/srtmp_"+fn + "/")
+        self._inference_video("/tmp/" + fn , "/tmp/srtmp_"+fn + "/")
         #self._frame_to_video(fps=fps,lr_video_path= "./tmp/" +"srtmp_"+ fn + "/", sr_video_path=sr_video_path +"sr_"+ fn)
         #blurImage.aug_all_folder("./tmp/srtmp_"+fn + "/","./tmp/srtmp_"+fn + "/",'edge_enhance')
 
-        self._frame_to_video_woaudio(fps=fps,lr_video_path= "./tmp/" +"srtmp_"+ fn + "/", sr_video_path=sr_video_path +"sr_"+ fn)
+        self._frame_to_video_woaudio(fps=fps,lr_video_path= "/tmp/" +"srtmp_"+ fn + "/", sr_video_path=sr_video_path +"sr_"+ fn+'.mp4')
         shutil.rmtree("./tmp/" + fn,ignore_errors=True)
         shutil.rmtree("./tmp/srtmp_"+fn,ignore_errors=True )
 
     def sr_video_nosr(self,lr_video_path,sr_video_path):
         fps = self._video_to_frame(lr_video_path)
         fn = ntpath.basename(lr_video_path)
-        self._infvideo_fake("./tmp/" + fn , "./tmp/srtmp_"+fn + "/")
-        self._frame_to_video_woaudio(fps=fps,lr_video_path= "./tmp/" +"srtmp_"+ fn + "/", sr_video_path=sr_video_path +"sr_"+ fn)
-        shutil.rmtree("./tmp/" + fn,ignore_errors=True)
-        shutil.rmtree("./tmp/srtmp_"+fn,ignore_errors=True )
+        self._infvideo_fake("/tmp/" + fn , "/tmp/srtmp_"+fn + "/")
+        self._frame_to_video_woaudio(fps=fps,lr_video_path= "/tmp/" +"srtmp_"+ fn + "/", sr_video_path=sr_video_path +"sr_"+ fn+'.mp4')
+        shutil.rmtree("/tmp/" + fn,ignore_errors=True)
+        shutil.rmtree("/tmp/srtmp_"+fn,ignore_errors=True )
 
 if __name__ == '__main__':
-    srm2 = Infmodule_proSR(model_path="./model/proSR/proSR_x2.pth", is_CUDA=False,upscale_factor=2) #cuda -> is_CUDA=True upscale x2
-    srm4 = Infmodule_proSR(model_path="./model/proSR/proSR_x4.pth", is_CUDA=False,upscale_factor=4) #cuda -> is_CUDA=True upscale x4
+    srm2 = Infmodule_proSR(model_path="./model/60_best_psnr_x2_psnr_x4_net_G.pth", is_CUDA=True,upscale_factor=2) #cuda -> is_CUDA=True upscale x2
+    srm4 = Infmodule_proSR(model_path="./model/60_best_psnr_x2_psnr_x4_net_G.pth", is_CUDA=True,upscale_factor=4) #cuda -> is_CUDA=True upscale x4
 
     lr = input("asdf: ")
     print("base filename : "+ ntpath.basename(lr))

@@ -34,7 +34,7 @@ def payment_request(request, amount):
         "productDesc":"테스트 결제",
         "apiKey": "sk_test_apikey1234567890",
         "resultCallback": "https://myshop.com/toss/result.php",
-        "retUrl": "https://videosr.koreacentral.cloudapp.azure.com"
+        "retUrl": "https://www.hwajilguji.online"
         + reverse('payment:payment_success', kwargs={'amount': amount}),
         "cashRecipt": False
     }
@@ -50,9 +50,9 @@ def payment_request(request, amount):
 
 @login_required
 def payment_success(request, amount):
-
     # orderNo로 payToken가져와서 check
     orderNo = request.GET['orderNo']
+    logger.debug("orderno: {}".format(orderNo))
     payToken = get_object_or_404(Order, orderNo=orderNo).payToken
     # 결제를 제대로 시도하지 않았을 때
     if "PAY_APPROVED" != payment_check(payToken):

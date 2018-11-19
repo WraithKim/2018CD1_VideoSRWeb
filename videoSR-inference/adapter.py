@@ -3,10 +3,10 @@
 import sys, pika, psycopg2
 import json, logging, logging.config, time
 from pika.exceptions import AMQPError
-# from inf_prosr import Infmodule_proSR
+from inf_prosr import Infmodule_proSR
 
 ########## adapter settings #############
-PROJECT_DIR = "/home/wraithkim/videoSRWeb/"
+PROJECT_DIR = "/home/ubuntu/2018CD1_VideoSRWeb/"
 
 ##### logger config
 with open(PROJECT_DIR + 'videoSR-inference/logging.json', 'r') as f:
@@ -80,15 +80,15 @@ class SRDefaultWebAdapter:
         file_id = int(file_info_list[0])
         scale_factor = int(file_info_list[3])
 
-        time.sleep(10) # FIXME: Test용 코드
+        # time.sleep(10) # FIXME: Test용 코드
         self._update_state(file_id, "IP")
         if scale_factor == 2:
             logger.info("SR x2 start file: {}".format(file_id))
-            # self.srm_scale2.sr_video_nosr(file_info_list[1], file_info_list[2])
+            self.srm_scale2.sr_video(file_info_list[1], file_info_list[2])
         if scale_factor == 4:
             logger.info("SR x4 start file: {}".format(file_id))
-            # self.srm_scale4.sr_video_nosr(file_info_list[1], file_info_list[2])
-        time.sleep(15) # FIXME: Test용 코드
+            self.srm_scale4.sr_video(file_info_list[1], file_info_list[2])
+        # time.sleep(15) # FIXME: Test용 코드
 
         self._update_state(file_id, "FI")
         logger.info("file id {} Done".format(file_id))
@@ -126,24 +126,23 @@ class SRDefaultWebAdapter:
 
         return updated_rows
 
-    def run_module(self, is_test=False):
+    def run_module(self):
         """어댑터에 연결된 SR 모듈을 실행함
         """
-        if not is_test:
-            if self.srm_scale2 is None or self.srm_scale4 is None:
-                logger.error("SR Module doesn't exist")
-                return
+        if self.srm_scale2 is None or self.srm_scale4 is None:
+            logger.error("SR Module doesn't exist")
+            return
         self._run_mq()
 
 
 def main():
-    # srm_scale2 = Infmodule_proSR(model_path=PROJECT_DIR+"model/proSR/proSR_x2.pth", is_CUDA=False)
-    # srm_scale4 = Infmodule_proSR(model_path=PROJECT_DIR+"model/proSR/proSR_x4.pth", is_CUDA=False)
-    srm_scale2 = None #FIXME: test용 코드
-    srm_scale4 = None #FIXME: test용 코드
+    srm_scale2 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/proSR/proSR_x2.pth", is_CUDA=True)
+    srm_scale4 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/proSR/proSR_x4.pth", is_CUDA=True)
+    #srm_scale2 = None #FIXME: test용 코드
+    #srm_scale4 = None #FIXME: test용 코드
     adapter = SRDefaultWebAdapter(srm_scale2, srm_scale4)
     logger.info("SR Module on")
-    adapter.run_module(is_test=True)
+    adapter.run_module()
 
 if __name__ == "__main__":
     main()
