@@ -187,14 +187,20 @@ LOGGING = {
         }, 
     },
 
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.RequireDebugTrue',
+        }
+    },
+
     'handlers': {
         'debug': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(BASE_DIR, 'log','debug.log'),     
-            'formatter': 'verbose',
-            'maxBytes':1024*1024*10, 
-            'backupCount':5,
+            'formatter': 'simple',
+            'maxBytes':1024*1024,
+            'filters': ['require_debug_true'],
         },
 
         'file': {
@@ -208,8 +214,8 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
-            'level': 'INFO',
+            'handlers': ['debug', 'file'],
+            'level': 'DEBUG',
             'propagate': True,
         },
 
@@ -217,21 +223,6 @@ LOGGING = {
             'handlers':['file'], 
             'propagate': False, 
             'level':'INFO', 
-        }, 
-        
-        'login': { 
-            'handlers': ['debug'], 
-            'level': 'DEBUG', 
-        }, 
-
-        'dashboard': { 
-            'handlers': ['debug'], 
-            'level': 'DEBUG', 
-        }, 
-
-        'payment': { 
-            'handlers': ['debug'], 
-            'level': 'DEBUG', 
         }, 
     }
 }
