@@ -100,13 +100,14 @@ def upload_complete(request):
 def download_file(request, pk):
     file_to_download = get_object_or_404(UploadedFile, pk=pk, owner=request.user)
     (dirname, basename) = os.path.split(file_to_download.uploaded_file.name)
-    basename = "sr_" + basename + ".mp4"
+    #FIXME: test # basename = "sr_" + basename + ".mp4"
     sr_relative_path = os.path.join(dirname, basename)
     if not os.path.isfile(settings.MEDIA_ROOT + sr_relative_path):
         logger.warn("Download file - file not found. pk: {}".format(pk))
         return HttpResponse(status=404)
     response = HttpResponse()
     root,ext = os.path.splitext(file_to_download.uploaded_filename)
+    root = root + ext #FIXME: test
     response['Content-Disposition'] = 'attachment; filename={0}'.format(urllib.parse.quote(root + ".mp4"))
     response['X-Accel-Redirect'] = '/media/{0}'.format(sr_relative_path)
     return response

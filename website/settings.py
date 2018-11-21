@@ -35,7 +35,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['www.hwajilguji.online']
+ALLOWED_HOSTS = ['videosr.koreacentral.cloudapp.azure.com']
 
 
 # Application definition
