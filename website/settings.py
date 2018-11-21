@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
-import os
-import json
+from django.utils.log import RequireDebugTrue
+import os, json
 
 # open config.json
 with open('config.json', 'r') as f:
@@ -189,8 +189,8 @@ LOGGING = {
 
     'filters': {
         'require_debug_true': {
-            '()': 'django.utils.RequireDebugTrue',
-        }
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
     },
 
     'handlers': {
