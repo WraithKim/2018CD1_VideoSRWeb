@@ -1,12 +1,12 @@
 #! /usr/bin/env python
 
 import sys, pika, psycopg2
-import json, logging, logging.config, time
+import json, logging, logging.config, os, time
 from pika.exceptions import AMQPError
-from inf_prosr import Infmodule_proSR
+# from inf_prosr import Infmodule_proSR
 
 ########## adapter settings #############
-PROJECT_DIR = "/home/ubuntu/2018CD1_VideoSRWeb/"
+PROJECT_DIR = "/home/wraithkim/videoSRWeb/" #FIXME: test(+ logger path)
 
 ##### logger config
 with open(PROJECT_DIR + 'videoSR-inference/logging.json', 'r') as f:
@@ -74,21 +74,24 @@ class SRDefaultWebAdapter:
 
         ### 메세지 처리
         logger.info("Received %r" % body)
-        # list[0] = file_id, list[1] = 처리할 파일 경로, list[2] = 처리 후 결과물 dir, list[3] = scale factor
+        # list[0] = 파일의 pk, list[1] = 확대 배율
         decoded_body = body.decode('utf-8')
         file_info_list = decoded_body.split(" ")
         file_id = int(file_info_list[0])
-        scale_factor = int(file_info_list[3])
-
-        # time.sleep(10) # FIXME: Test용 코드
+        scale_factor = int(file_info_list[1])
+        (email, file_path) = self._read_file_info(file_id)
+        file_path = os.path.join(PROJECT_DIR, "media", file_path)
+        (dirname, basename) = os.path.split(file_path)
+        logger.debug("email: {} dirname: {} basename: {}".format(email, dirname, basename))
+        time.sleep(10) # FIXME: Test용 코드
         self._update_state(file_id, "IP")
         if scale_factor == 2:
-            logger.info("SR x2 start file: {}".format(file_id))
-            self.srm_scale2.sr_video(file_info_list[1], file_info_list[2])
+            logger.info("SR x2 start file: {} {}".format(file_id, file_path))
+            # self.srm_scale2.sr_video(file_path, dirname)
         if scale_factor == 4:
-            logger.info("SR x4 start file: {}".format(file_id))
-            self.srm_scale4.sr_video(file_info_list[1], file_info_list[2])
-        # time.sleep(15) # FIXME: Test용 코드
+            logger.info("SR x4 start file: {} {}".format(file_id, file_path))
+            # self.srm_scale4.sr_video(file_path, dirname)
+        time.sleep(15) # FIXME: Test용 코드
 
         self._update_state(file_id, "FI")
         logger.info("file id {} Done".format(file_id))
@@ -97,6 +100,30 @@ class SRDefaultWebAdapter:
         # 반드시 큐에도 ack를 보내야 큐에서도 메세지가 사라짐
         # (그렇지 않으면 큐에 이 작업이 다시 들어감)
         ch.basic_ack(delivery_tag = method.delivery_tag)
+
+    def _read_file_info(self, file_id):
+        sql = """ SELECT email, uploaded_file
+                        FROM dashboard_uploadedfile 
+                        INNER JOIN auth_user
+                        ON (dashboard_uploadedfile = auth_user.id)
+                        WHERE id = %s"""
+        conn = None
+        row = None
+        try: 
+            conn = psycopg2.connect(conn_string)
+            cur = conn.cursor()
+            cur.execute(sql, (file_id))
+            row = cur.fetchone()
+            if row is not None:
+                logger.info("SELECT file {} of user {}: {}".format(file_id, row[0], row[1]))
+
+            cur.close()
+        except psycopg2.DatabaseError as error:
+            logger.error(error)
+        finally:
+            if conn is not None:
+                conn.close()
+        return row
 
     def _update_state(self, file_id, status):
         sql = """ UPDATE dashboard_uploadedfile
@@ -118,7 +145,7 @@ class SRDefaultWebAdapter:
             # Close communication with the PostgreSQL database
             cur.close()
             logger.info("UPDATE progress to {}: {}".format(status, file_id))
-        except (Exception, psycopg2.DatabaseError) as error:
+        except psycopg2.DatabaseError as error:
             logger.error(error)
         finally:
             if conn is not None:
@@ -136,9 +163,9 @@ class SRDefaultWebAdapter:
 
 
 def main():
-    srm_scale2 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/proSR/proSR_x2.pth", is_CUDA=True)
-    srm_scale4 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/proSR/proSR_x4.pth", is_CUDA=True)
-    adapter = SRDefaultWebAdapter(srm_scale2, srm_scale4)
+    # srm_scale2 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/proSR/proSR_x2.pth", is_CUDA=True)
+    # srm_scale4 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/proSR/proSR_x4.pth", is_CUDA=True)
+    adapter = SRDefaultWebAdapter("Dummy_srm", "Dummy_srm")
     logger.info("SR Module on")
     adapter.run_module()
 

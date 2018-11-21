@@ -68,10 +68,8 @@ def upload_complete(request):
                 
             new_file_path = settings.MEDIA_ROOT + new_file.uploaded_file.name
             # enqueue this file in message queue
-            message_body = "{} {} {} {}".format(
+            message_body = "{} {}".format(
                 new_file.pk,
-                new_file_path,
-                os.path.dirname(new_file_path) + os.sep,
                 scale_factor)
             connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
             channel = connection.channel()
