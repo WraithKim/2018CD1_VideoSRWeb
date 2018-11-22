@@ -89,7 +89,7 @@ class SRDefaultWebAdapter:
         (user_email, file_path) = self._read_file_info(file_id)
         file_path = os.path.join(PROJECT_DIR, "media", file_path)
         (dirname, basename) = os.path.split(file_path)
-        logger.debug("email: {} dirname: {} basename: {}".format(user_email, dirname, basename))
+        dirname = os.path.join(dirname, '')
         self._update_state(file_id, "IP")
         if scale_factor == 2:
             logger.info("SR x2 start file: {} {}".format(file_id, file_path))
@@ -111,14 +111,14 @@ class SRDefaultWebAdapter:
         sql = """ SELECT email, uploaded_file
                         FROM dashboard_uploadedfile 
                         INNER JOIN auth_user
-                        ON (dashboard_uploadedfile = auth_user.id)
-                        WHERE id = %s"""
+                        ON (dashboard_uploadedfile.owner_id = auth_user.id)
+                        WHERE dashboard_uploadedfile.id = %s"""
         conn = None
         row = None
         try: 
             conn = psycopg2.connect(conn_string)
             cur = conn.cursor()
-            cur.execute(sql, (file_id))
+            cur.execute(sql, (file_id,))
             row = cur.fetchone()
             if row is not None:
                 logger.info("SELECT file {} of user {}: {}".format(file_id, row[0], row[1]))
@@ -159,7 +159,7 @@ class SRDefaultWebAdapter:
 
         return updated_rows
 
-    def _send_mail(to):
+    def _send_mail(self, to):
         # 메시지 내용 작성
         content = '화질 개선 작업이 완료되었습니다\n'\
                 + '본 사이트에 접속하시어 결과물 확인을 부탁드립니다.\n\n'\

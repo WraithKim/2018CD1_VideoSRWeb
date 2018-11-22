@@ -64,7 +64,7 @@ class Infmodule_proSR:
             "ffprobe -v 0 -of csv=p=0 -select_streams 0 -show_entries stream=r_frame_rate " + str(lr_video_path),
             shell=True)
         fn = ntpath.basename(lr_video_path)
-        videocmd = "ffmpeg -r " + tmp_fps.decode('ascii').strip('\n') + " -i " + str(lr_video_path) + " -q:v 1 " + str(
+        videocmd = "ffmpeg -y -r " + tmp_fps.decode('ascii').strip('\n') + " -i " + str(lr_video_path) + " -q:v 1 " + str(
             TMP_FOLDER) + "/" + fn + "/%10d.png"
         audiocmd = "ffmpeg -y -i " + str(lr_video_path) + " -vn -ar 44100 -ac 2 -q:a 0 -ab 192k -f mp3 " + str(
             TMP_FOLDER) + "/" + fn + "/output_audio.mp3"
@@ -76,7 +76,7 @@ class Infmodule_proSR:
 
     def _frame_to_video(self,fps, lr_video_path, sr_video_path=None):
         fn = ntpath.basename(lr_video_path)
-        videocmd = "ffmpeg -f image2 -r " + str(fps.decode('ascii').strip('\n')) + " -pattern_type sequence -i " + str(
+        videocmd = "ffmpeg -y -f image2 -r " + str(fps.decode('ascii').strip('\n')) + " -pattern_type sequence -i " + str(
             lr_video_path) + "\"%10d.png\"" + " -i " + str(
             lr_video_path) + "../output_audio.mp3" + " -q:v 1 -vcodec libx264 -pix_fmt yuv420p " + str(sr_video_path)
 
@@ -85,7 +85,7 @@ class Infmodule_proSR:
 
     def _frame_to_video_woaudio(self,fps, lr_video_path, sr_video_path=None):
         fn = ntpath.basename(lr_video_path)
-        videocmd = "ffmpeg -f image2 -r " + str(fps.decode('ascii').strip('\n')) + " -pattern_type sequence -i " + str(
+        videocmd = "ffmpeg -y -f image2 -r " + str(fps.decode('ascii').strip('\n')) + " -pattern_type sequence -i " + str(
             lr_video_path) + "\"%10d.png\"" +  " -q:v 1 -vcodec libx264 -pix_fmt yuv420p " + str(sr_video_path)
 
         print(videocmd)
