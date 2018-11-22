@@ -1,7 +1,9 @@
 #! /usr/bin/env python
 
-import sys, pika, psycopg2
+import sys, pika, psycopg2, smtplib
 import json, logging, logging.config, os, time
+from email.mime.text import MIMEText
+from email.header import Header
 from pika.exceptions import AMQPError
 # from inf_prosr import Infmodule_proSR
 
@@ -27,16 +29,21 @@ def handle_exception(exc_type, exc_value, exc_traceback):
 
 sys.excepthook = handle_exception
 
-##### DB config
+##### project config
 with open(PROJECT_DIR + 'config.json', 'r') as f:
-    dbConfig = json.load(f)
+    projectConfig = json.load(f)
 
 conn_string = "host='{hostname}' dbname='{dbname}' user='{username}' password='{password}'".format(
             hostname="localhost",
-            dbname=dbConfig['DATABASE']['NAME'],
-            username=dbConfig['DATABASE']['USER'],
-            password=dbConfig['DATABASE']['PASSWORD']
+            dbname=projectConfig['DATABASE']['NAME'],
+            username=projectConfig['DATABASE']['USER'],
+            password=projectConfig['DATABASE']['PASSWORD']
         )
+
+smtp_host = projectConfig['MAIL']['SMTP_HOST']
+smtp_port = projectConfig['MAIL']['SMTP_PORT']
+smtp_email = projectConfig['MAIL']['EMAIL']
+smtp_pw = projectConfig['MAIL']['PASSWORD']
 ############ adapter settings end ##################
 
 class SRDefaultWebAdapter:
@@ -79,10 +86,10 @@ class SRDefaultWebAdapter:
         file_info_list = decoded_body.split(" ")
         file_id = int(file_info_list[0])
         scale_factor = int(file_info_list[1])
-        (email, file_path) = self._read_file_info(file_id)
+        (user_email, file_path) = self._read_file_info(file_id)
         file_path = os.path.join(PROJECT_DIR, "media", file_path)
         (dirname, basename) = os.path.split(file_path)
-        logger.debug("email: {} dirname: {} basename: {}".format(email, dirname, basename))
+        logger.debug("email: {} dirname: {} basename: {}".format(user_email, dirname, basename))
         time.sleep(10) # FIXME: Test용 코드
         self._update_state(file_id, "IP")
         if scale_factor == 2:
@@ -94,6 +101,7 @@ class SRDefaultWebAdapter:
         time.sleep(15) # FIXME: Test용 코드
 
         self._update_state(file_id, "FI")
+        self._send_mail(user_email)
         logger.info("file id {} Done".format(file_id))
         ### 메세지 처리 끝
 
@@ -153,6 +161,23 @@ class SRDefaultWebAdapter:
 
         return updated_rows
 
+    def _send_mail(to):
+        # 메시지 내용 작성
+        content = '화질 개선 작업이 완료되었습니다\n'\
+                + '본 사이트에 접속하시어 결과물 확인을 부탁드립니다.\n\n'\
+                + '감사합니다\n\n'
+
+        msg = MIMEText(content.encode('utf-8'), 'plain', 'utf-8')
+        msg['Subject'] = Header('[화질구지] 작업완료 확인 메일', 'utf-8')
+        msg['From'] = smtp_email
+        msg['To'] = to
+        try: 
+            with smtplib.SMTP(smtp_host, smtp_port) as smtp:
+                smtp.login(smtp_email, smtp_pw)
+                smtp.sendmail(smtp_email, [to], msg.as_string())
+        except smtplib.SMTPExcption as e:
+            logger.error(e)
+
     def run_module(self):
         """어댑터에 연결된 SR 모듈을 실행함
         """
@@ -163,6 +188,7 @@ class SRDefaultWebAdapter:
 
 
 def main():
+    # FIXME: Test 코드
     # srm_scale2 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/proSR/proSR_x2.pth", is_CUDA=True)
     # srm_scale4 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/proSR/proSR_x4.pth", is_CUDA=True)
     adapter = SRDefaultWebAdapter("Dummy_srm", "Dummy_srm")
