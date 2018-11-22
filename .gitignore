@@ -377,3 +377,4 @@ config.json
 /static/
 # log directory of this project
 /log/
+videoSR-inference/model/
