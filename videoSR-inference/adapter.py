@@ -173,7 +173,7 @@ class SRDefaultWebAdapter:
             with smtplib.SMTP(smtp_host, smtp_port) as smtp:
                 smtp.login(smtp_email, smtp_pw)
                 smtp.sendmail(smtp_email, [to], msg.as_string())
-        except smtplib.SMTPExcption as e:
+        except smtplib.SMTPException as e:
             logger.error(e)
 
     def run_module(self):
