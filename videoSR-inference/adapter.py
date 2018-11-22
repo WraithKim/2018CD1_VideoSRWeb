@@ -5,10 +5,10 @@ import json, logging, logging.config, os, time
 from email.mime.text import MIMEText
 from email.header import Header
 from pika.exceptions import AMQPError
-# from inf_prosr import Infmodule_proSR
+from inf_prosr import Infmodule_proSR
 
 ########## adapter settings #############
-PROJECT_DIR = "/home/wraithkim/videoSRWeb/" #FIXME: test(+ logger path)
+PROJECT_DIR = "/home/ubuntu/2018CD1_VideoSRWeb/"
 
 ##### logger config
 with open(PROJECT_DIR + 'videoSR-inference/logging.json', 'r') as f:
@@ -90,15 +90,13 @@ class SRDefaultWebAdapter:
         file_path = os.path.join(PROJECT_DIR, "media", file_path)
         (dirname, basename) = os.path.split(file_path)
         logger.debug("email: {} dirname: {} basename: {}".format(user_email, dirname, basename))
-        time.sleep(10) # FIXME: Test용 코드
         self._update_state(file_id, "IP")
         if scale_factor == 2:
             logger.info("SR x2 start file: {} {}".format(file_id, file_path))
-            # self.srm_scale2.sr_video(file_path, dirname)
+            self.srm_scale2.sr_video(file_path, dirname)
         if scale_factor == 4:
             logger.info("SR x4 start file: {} {}".format(file_id, file_path))
-            # self.srm_scale4.sr_video(file_path, dirname)
-        time.sleep(15) # FIXME: Test용 코드
+            self.srm_scale4.sr_video(file_path, dirname)
 
         self._update_state(file_id, "FI")
         self._send_mail(user_email)
@@ -188,10 +186,9 @@ class SRDefaultWebAdapter:
 
 
 def main():
-    # FIXME: Test 코드
-    # srm_scale2 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/proSR/proSR_x2.pth", is_CUDA=True)
-    # srm_scale4 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/proSR/proSR_x4.pth", is_CUDA=True)
-    adapter = SRDefaultWebAdapter("Dummy_srm", "Dummy_srm")
+    srm_scale2 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/proSR/proSR_x2.pth", is_CUDA=True)
+    srm_scale4 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/proSR/proSR_x4.pth", is_CUDA=True)
+    adapter = SRDefaultWebAdapter(srm_scale2, srm_scale4)
     logger.info("SR Module on")
     adapter.run_module()
 

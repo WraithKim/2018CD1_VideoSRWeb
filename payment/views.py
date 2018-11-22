@@ -34,7 +34,7 @@ def payment_request(request, amount):
         "productDesc":"테스트 결제",
         "apiKey": "sk_test_apikey1234567890",
         "resultCallback": "https://myshop.com/toss/result.php",
-        "retUrl": "https://videosr.koreacentral.cloudapp.azure.com"
+        "retUrl": "https://www.hwajilguji.online"
         + reverse('payment:payment_success', kwargs={'amount': amount}),
         "cashRecipt": False
     }
