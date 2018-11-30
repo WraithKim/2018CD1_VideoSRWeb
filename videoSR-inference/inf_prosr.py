@@ -74,11 +74,10 @@ class Infmodule_proSR:
         os.system(audiocmd)
         return tmp_fps
 
-    def _frame_to_video(self,fps, lr_video_path, sr_video_path=None):
+    def _frame_to_video(self,fps, lr_video_path, sr_video_path=None,orig=None):
         fn = ntpath.basename(lr_video_path)
         videocmd = "ffmpeg -y -f image2 -r " + str(fps.decode('ascii').strip('\n')) + " -pattern_type sequence -i " + str(
-            lr_video_path) + "\"%10d.png\"" + " -i " + str(
-            lr_video_path) + "../output_audio.mp3" + " -q:v 1 -vcodec libx264 -pix_fmt yuv420p " + str(sr_video_path)
+            lr_video_path) + "\"%10d.png\"" + " -i " + str(TMP_FOLDER)+"/"+orig+ "/output_audio.mp3" + " -q:v 1 -vcodec libx264 -pix_fmt yuv420p " + str(sr_video_path)
 
         print(videocmd)
         os.system(videocmd)
@@ -152,7 +151,7 @@ class Infmodule_proSR:
         #self._frame_to_video(fps=fps,lr_video_path= "./tmp/" +"srtmp_"+ fn + "/", sr_video_path=sr_video_path +"sr_"+ fn)
         #blurImage.aug_all_folder("./tmp/srtmp_"+fn + "/","./tmp/srtmp_"+fn + "/",'edge_enhance')
 
-        self._frame_to_video_woaudio(fps=fps,lr_video_path= "/tmp/" +"srtmp_"+ fn + "/", sr_video_path=sr_video_path +"sr_"+ fn+'.mp4')
+        self._frame_to_video_woaudio(fps=fps,lr_video_path= "/tmp/" +"srtmp_"+ fn + "/", sr_video_path=sr_video_path +"sr_"+ fn+'.mp4',orig=fn)
         shutil.rmtree("./tmp/" + fn,ignore_errors=True)
         shutil.rmtree("./tmp/srtmp_"+fn,ignore_errors=True )
 
