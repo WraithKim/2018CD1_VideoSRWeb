@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import sys, pika, psycopg2, smtplib
+import sys, pika, psycopg2, smtplib, signal
 import json, logging, logging.config, os, time
 from email.mime.text import MIMEText
 from email.header import Header
@@ -53,11 +53,24 @@ class SRDefaultWebAdapter:
     def __init__(self, srm_scale2, srm_scale4):
         self.srm_scale2 = srm_scale2
         self.srm_scale4 = srm_scale4
+        self._stop_requested = False
+        self._connection = None
+        signal.signal(signal.SIGTERM, self._sigterm_received)
+        signal.signal(signal.SIGINT, self._sigterm_received)
+
+    def _sigterm_received(self, signum, frame):
+        self._stop_requested = True
+
+    def _check_stop_requested(self):
+        if self._stop_requested:
+            if self._connection is not None:
+                self._connection.close()
 
     def _run_mq(self):
         try:
-            connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
-            channel = connection.channel()
+            self._connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+            self._connection.add_timeout(1.0, self._check_stop_requested)
+            channel = self._connection.channel()
     
             # 어느 큐에 연결할지 선언함
             # 만약 선언한 큐가 존재하지 않으면 rabbitMQ에 자동으로 생성함.
@@ -68,12 +81,10 @@ class SRDefaultWebAdapter:
     
             logger.debug("Waiting for request.")
             channel.start_consuming()
-        except KeyboardInterrupt:
-            # Gracefully close the connection
-            connection.close()
         except AMQPError as e:
             logger.error(e)
-            connection.close()
+            if self._connection is not None:
+                self._connection.close()
 
     def _callback_mq(self, ch, method, properties, body):
 
