@@ -151,7 +151,7 @@ class Infmodule_proSR:
         #self._frame_to_video(fps=fps,lr_video_path= "./tmp/" +"srtmp_"+ fn + "/", sr_video_path=sr_video_path +"sr_"+ fn)
         #blurImage.aug_all_folder("./tmp/srtmp_"+fn + "/","./tmp/srtmp_"+fn + "/",'edge_enhance')
 
-        self._frame_to_video_woaudio(fps=fps,lr_video_path= "/tmp/" +"srtmp_"+ fn + "/", sr_video_path=sr_video_path +"sr_"+ fn+'.mp4',orig=fn)
+        self._frame_to_video(fps=fps,lr_video_path= "/tmp/" +"srtmp_"+ fn + "/", sr_video_path=sr_video_path +"sr_"+ fn+'.mp4',orig=fn)
         shutil.rmtree("./tmp/" + fn,ignore_errors=True)
         shutil.rmtree("./tmp/srtmp_"+fn,ignore_errors=True )
 

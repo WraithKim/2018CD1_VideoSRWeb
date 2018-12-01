@@ -197,8 +197,8 @@ class SRDefaultWebAdapter:
 
 
 def main():
-    srm_scale2 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/proSR/proSR_x2.pth", is_CUDA=True)
-    srm_scale4 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/proSR/proSR_x4.pth", is_CUDA=True)
+    srm_scale2 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/271_best_psnr_x4_net_G.pth", is_CUDA=True)
+    srm_scale4 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/271_best_psnr_x4_net_G.pth", is_CUDA=True)
     adapter = SRDefaultWebAdapter(srm_scale2, srm_scale4)
     logger.info("SR Module on")
     adapter.run_module()
