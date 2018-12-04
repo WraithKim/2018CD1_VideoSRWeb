@@ -55,36 +55,37 @@ class SRDefaultWebAdapter:
         self.srm_scale4 = srm_scale4
         self._stop_requested = False
         self._connection = None
+        self._channel = None
         signal.signal(signal.SIGTERM, self._sigterm_received)
-        signal.signal(signal.SIGINT, self._sigterm_received)
 
     def _sigterm_received(self, signum, frame):
         self._stop_requested = True
 
     def _check_stop_requested(self):
         if self._stop_requested:
-            if self._connection is not None:
-                self._connection.close()
+            if self._channel is not None and self_channel.is_open:
+                self._channel.close()
+            sys.exit(0)
 
     def _run_mq(self):
         try:
-            self._connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+            self._connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost', heartbeat=0))
             self._connection.add_timeout(1.0, self._check_stop_requested)
-            channel = self._connection.channel()
+            self._channel = self._connection.channel()
     
             # 어느 큐에 연결할지 선언함
             # 만약 선언한 큐가 존재하지 않으면 rabbitMQ에 자동으로 생성함.
-            channel.queue_declare(queue='sr_queue', durable=True)
+            self._channel.queue_declare(queue='sr_queue', durable=True)
             # 이미 메세지를 처리 중인 worker에게는 메세지를 전달하지 않음(공평한 작업 분배)
-            channel.basic_qos(prefetch_count=1)
-            channel.basic_consume(self._callback_mq, queue='sr_queue')
+            self._channel.basic_qos(prefetch_count=1)
+            self._channel.basic_consume(self._callback_mq, queue='sr_queue')
     
             logger.debug("Waiting for request.")
-            channel.start_consuming()
-        except AMQPError as e:
+            self._channel.start_consuming()
+        except (KeyboardInterrupt, AMQPError) as e:
             logger.error(e)
-            if self._connection is not None:
-                self._connection.close()
+            if self._channel is not None and self._channel.is_open:
+                self._channel.close()
 
     def _callback_mq(self, ch, method, properties, body):
 
@@ -111,22 +112,21 @@ class SRDefaultWebAdapter:
 
         self._update_state(file_id, "FI")
         self._send_mail(user_email)
-        logger.info("file id {} Done".format(file_id))
         ### 메세지 처리 끝
-
         # 반드시 큐에도 ack를 보내야 큐에서도 메세지가 사라짐
         # (그렇지 않으면 큐에 이 작업이 다시 들어감)
         ch.basic_ack(delivery_tag = method.delivery_tag)
+        logger.info("file id {} Done".format(file_id))
 
     def _read_file_info(self, file_id):
         sql = """ SELECT email, uploaded_file
-                        FROM dashboard_uploadedfile 
+                        FROM dashboard_uploadedfile
                         INNER JOIN auth_user
                         ON (dashboard_uploadedfile.owner_id = auth_user.id)
                         WHERE dashboard_uploadedfile.id = %s"""
         conn = None
         row = None
-        try: 
+        try:
             conn = psycopg2.connect(conn_string)
             cur = conn.cursor()
             cur.execute(sql, (file_id,))
@@ -180,7 +180,7 @@ class SRDefaultWebAdapter:
         msg['Subject'] = Header('[화질구지] 작업완료 확인 메일', 'utf-8')
         msg['From'] = smtp_email
         msg['To'] = to
-        try: 
+        try:
             with smtplib.SMTP(smtp_host, smtp_port) as smtp:
                 smtp.login(smtp_email, smtp_pw)
                 smtp.sendmail(smtp_email, [to], msg.as_string())
@@ -197,7 +197,7 @@ class SRDefaultWebAdapter:
 
 
 def main():
-    srm_scale2 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/271_best_psnr_x4_net_G.pth", is_CUDA=True)
+    srm_scale2 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/271_best_psnr_x4_net_G.pth", upscale_factor=2, is_CUDA=True)
     srm_scale4 = Infmodule_proSR(model_path=PROJECT_DIR+"videoSR-inference/model/271_best_psnr_x4_net_G.pth", is_CUDA=True)
     adapter = SRDefaultWebAdapter(srm_scale2, srm_scale4)
     logger.info("SR Module on")
