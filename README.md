@@ -21,7 +21,7 @@
 # 구현된 기능
 - [x] 웹 서버 구축
 - [x] 회원 관리
-- [ ] UI
+- [x] UI
 - [x] 결제 시스템(exception handling... espacially double request(pay/spent) handling)
 - [x] 동영상 SR (But, Work in progress......performance is too low :-(  )
 - [x] 웹-SR 모듈간 데이터 교환
